@@ -1,0 +1,11 @@
+@import './reset.css';
+@import './App.css';
+
+@font-face {
+  font-family: 'Regular';
+  src: local('Roboto'), url('./assets/Roboto-Regular.ttf') format('truetype')
+}
+
+:root {
+  font-family: "Roboto", sans-serif;
+}
