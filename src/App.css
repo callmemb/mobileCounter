@@ -1,3 +1,56 @@
-body{
-  
+#app {
+
+  display: grid;
+  grid-template-areas: 'a m n';
+  grid-template-columns: minmax(50px, 1fr) minmax(0px, 500px) minmax(50px, 1fr);
+  grid-template-rows: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+
+  aside {
+    grid-area: a;
+  }
+
+  nav {
+    grid-area: n;
+
+    margin: 5px;
+  }
+
+  nav,
+  aside {
+    z-index: 2;
+    overflow: visible;
+  }
+
+  main {
+    grid-area: m;
+    background: var(--bg-base);
+    box-sizing: border-box;
+    border: 1px solid var(--border-base);
+    box-shadow: 0 0 10px var(--border-base);
+
+    overflow: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+
+    div {
+      scroll-snap-align: center;
+      height: 300px;
+      width: 300px;
+      background: blue;
+      min-height: 300px;
+    }
+
+  }
+
+
 }
