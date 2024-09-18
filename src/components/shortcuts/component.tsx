@@ -1,7 +1,7 @@
 import { useState, TouchEvent } from "react";
 import Link from "./link";
 
-export default function Side({ counters }: { counters: object[] }) {
+export default function Shortcuts({ counters }: { counters: object[] }) {
   const [touchHover, setTouchHover] = useState<string | null>(null);
 
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
@@ -18,7 +18,7 @@ export default function Side({ counters }: { counters: object[] }) {
 
   return (
     <div
-      className="side"
+      id="shortcuts"
       onTouchMove={onTouchMove}
       onTouchStart={onTouchMove}
       onTouchEnd={onTouchEnd}

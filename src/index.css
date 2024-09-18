@@ -1,7 +1,8 @@
 @import './reset.css';
 @import './App.css';
 
-@import './components/side/styles.css';
+@import './components/shortcuts/styles.css';
+@import './components/actions/styles.css';
 
 @font-face {
   font-family: 'Regular';

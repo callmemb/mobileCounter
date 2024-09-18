@@ -1,7 +1,7 @@
-.side {
+#shortcuts {
 
   container-type: inline-size;
-  container-name: side;
+
 
   touch-action: none;
 
@@ -78,7 +78,7 @@
         border-top: 1px solid var(--border-base);
         border-bottom: 1px solid var(--border-base);
         border-left: 0;
-        transition-delay: 100ms;
+        transition-delay: 180ms;
       }
 
       @media(hover: hover) {

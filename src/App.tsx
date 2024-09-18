@@ -1,4 +1,5 @@
-import Side from "./components/side/component";
+import Actions from "./components/actions/component";
+import Shortcuts from "./components/shortcuts/component";
 
 const counters = [
   {
@@ -33,15 +34,21 @@ function App() {
       {/* top left corner on desktop for logo and shit */}
       {/* <header></header> */}
 
+      <nav>
+        <Shortcuts counters={counters} />
+      </nav>
+
       <aside>
-        <Side counters={counters} />
+        <Actions />
       </aside>
+
       <main>
         {counters.map((c) => (
-          <div key={c.id} id={c.id}>{c.name}</div>
+          <div key={c.id} id={c.id}>
+            {c.name}
+          </div>
         ))}
       </main>
-      <nav>fddfh</nav>
     </div>
   );
 }
