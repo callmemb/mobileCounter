@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { angleToValue, valueToAngle, angleToPosition, positionToAngle, semiCircle } from './circularGeometry';
+import { angleToValue, valueToAngle, angleToPosition, positionToAngle, semiCircle } from './utils';
 
 describe('circularGeometry', () => {
   it('angleToValue should convert angle to value correctly', () => {

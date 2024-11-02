@@ -3,7 +3,8 @@ import {
   angleToPosition,
   valueToAngle,
   processSelection,
-} from "./circularGeometry";
+  debounce,
+} from "./utils";
 import "./style.css";
 
 const defaultHandlerContent = <div>+</div>;
@@ -80,9 +81,15 @@ export default function CircularSlider(props: CircularSliderProps) {
   const handlePointerEvent = useCallback(
     (ev: React.PointerEvent<HTMLDivElement>) => {
       ev.preventDefault();
+      /** moved variable
+       * Tracking if pointer was moved.
+       * Allow to submit with default value if pointer was clicked.
+       */
+      let moved = false;
       setMoving(true);
       if (containerRef.current) {
-        const handlePointerMove = (ev: PointerEvent) => {
+        const handlePointerMove = debounce((ev: PointerEvent) => {
+          moved = true;
           const value = processSelection(
             ev.clientX,
             ev.clientY,
@@ -94,7 +101,8 @@ export default function CircularSlider(props: CircularSliderProps) {
             safeEndAngle
           );
           setValue(value);
-        };
+        },0,false);
+
         const handlePointerUp = (ev: PointerEvent) => {
           setMoving(false);
           const value = processSelection(
@@ -108,19 +116,23 @@ export default function CircularSlider(props: CircularSliderProps) {
             safeEndAngle
           );
           if (value) {
-            onSubmit(value * stepSize);
+            if (moved) {
+              onSubmit(value * stepSize);
+            } else {
+              onSubmit(defaultValue);
+            }
           }
           setValue(defaultValue);
+          moved = false;
           window.removeEventListener("pointermove", handlePointerMove);
           window.removeEventListener("pointerup", handlePointerUp);
         };
 
-        window.addEventListener("pointermove", handlePointerMove, {
-          passive: true,
-        });
+        window.addEventListener("pointermove", handlePointerMove);
         window.addEventListener("pointerup", handlePointerUp);
 
         return () => {
+          moved = false;
           window.removeEventListener("pointermove", handlePointerMove);
           window.removeEventListener("pointerup", handlePointerUp);
         };
