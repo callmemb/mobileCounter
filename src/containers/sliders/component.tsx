@@ -23,7 +23,14 @@ const Sliders = (props: SlidersProps) => {
     <>
       {counters.map((c) => (
         <div key={c.id} id={c.id}>
-          <CircularSlider onSubmit={console.log} isDone={false}>
+          <CircularSlider
+            onSubmit={console.log}
+            isDone={false}
+            defaultValue={20}
+            maxValue={100}
+            // maxValue={c.dailyGoalOfSteps * c.unitsInStep * 2}
+            stepSize={c.unitsInStep}
+          >
             <div>
               <b>{c.label}</b>
               <small>

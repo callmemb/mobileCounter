@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const counterValidator = z.object({
-  id: z.any().optional(),
+  id: z.string().optional(),
   label: z.string().min(3),
   defaultNumberOfUnits: z.coerce.number().min(1),
   unitsName: z.string(),

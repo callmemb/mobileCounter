@@ -16,7 +16,7 @@ function App() {
         <Shortcuts
           side="left"
           items={counters.map((c) => ({
-            id: c.id,
+            id: `${c.id}`,
             label: c.label,
             icon: c.label[0],
             onClick: () => (window.location.hash = `${c.id}`),
