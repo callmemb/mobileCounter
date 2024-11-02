@@ -1,0 +1,37 @@
+.customModal {
+  padding: 0;
+  border: 1px solid var(--border-base);
+
+  .header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    border-bottom: 1px solid var(--border-base);
+
+
+    .title {
+      flex: 1;
+      padding: 0 .8rem;
+    }
+
+    .close {
+      border: none;
+      padding: .8rem;
+      cursor: pointer;
+      background: none;
+      border: 1px solid none;
+      transition: all 200ms linear;
+
+      &:hover {
+        background-color: var(--bg-base);
+        border-color: var(--border-primary);
+        color: var(--font-danger)
+      }
+    }
+  }
+
+  .content {
+    padding: .8rem;
+  }
+
+}

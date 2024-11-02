@@ -1,17 +1,36 @@
 import { useState, TouchEvent } from "react";
-import Link from "./link";
+import Button from "./button";
+import { item } from "./definitions";
 
-export default function Shortcuts({ counters }: { counters: object[] }) {
+/**
+ * Props for the Shortcuts component.
+ * @typedef {Object} Props
+ * @property {item[]} items - An array of shortcut items to display.
+ * @property {"left" | "right"} side - The side of the screen to display the shortcuts on.
+ */
+type Props = { items: item[]; side?: "left" | "right" };
+
+/**
+ * Shortcuts component for displaying a list of shortcut buttons.
+ * @param {Props} props - The component props.
+ * @returns {JSX.Element} The rendered Shortcuts component.
+ */
+export default function Shortcuts({ items, side = "left" }: Props) {
   const [touchHover, setTouchHover] = useState<string | null>(null);
+
 
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
     const t = e.touches[0];
-    const link = document.elementFromPoint(t.clientX, t.clientY) as HTMLElement;
-    setTouchHover(link?.dataset?.link || null);
+    const button = document.elementFromPoint(
+      t.clientX,
+      t.clientY
+    ) as HTMLElement;
+    setTouchHover(button?.dataset?.id || null);
   };
+
   const onTouchEnd = () => {
     if (typeof touchHover === "string") {
-      window.location.hash = "" + touchHover;
+      items.find((i) => i.id === touchHover)?.onClick();
     }
     setTouchHover(null);
   };
@@ -19,17 +38,13 @@ export default function Shortcuts({ counters }: { counters: object[] }) {
   return (
     <div
       id="shortcuts"
+      className={side}
       onTouchMove={onTouchMove}
       onTouchStart={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {counters.map((c) => (
-        <Link
-          key={c.id}
-          name={c.name}
-          id={c.id}
-          isHover={touchHover === c.id}
-        />
+      {items.map((c) => (
+        <Button side={side} key={c.id} {...c} isHover={touchHover === c.id} />
       ))}
     </div>
   );

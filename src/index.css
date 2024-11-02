@@ -1,8 +1,11 @@
 @import './reset.css';
 @import './App.css';
 
+@import './hooks/useModal.css';
+
 @import './components/shortcuts/styles.css';
-@import './components/actions/styles.css';
+
+
 
 @font-face {
   font-family: 'Regular';
@@ -18,6 +21,7 @@
   --border-primary: #2f4;
 
   --font-base: #444;
+  --font-danger: #f44;
 
 
 

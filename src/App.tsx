@@ -1,53 +1,45 @@
-import Actions from "./components/actions/component";
+import AddCounterForm from "./components/forms/addCounterForm";
 import Shortcuts from "./components/shortcuts/component";
-
-const counters = [
-  {
-    id: "1",
-    name: "name1",
-  },
-  {
-    id: "2",
-    name: "name2 asdxazs d asdsaddasddsad",
-  },
-  {
-    id: "3",
-    name: "name3",
-  },
-  {
-    id: "4",
-    name: "name4",
-  },
-  {
-    id: "5",
-    name: "name5",
-  },
-  {
-    id: "6",
-    name: "name6",
-  },
-];
+import useModal from "./hooks/useModal";
+import { useCounters } from "./store";
+import Sliders from "./containers/sliders/component";
 
 function App() {
+  const counters = useCounters();
+  const { dialogNode, show } = useModal("Add counter", AddCounterForm);
+
   return (
     <div id="app">
-      {/* top left corner on desktop for logo and shit */}
-      {/* <header></header> */}
+      {dialogNode}
 
       <nav>
-        <Shortcuts counters={counters} />
+        <Shortcuts
+          side="left"
+          items={counters.map((c) => ({
+            id: c.id,
+            label: c.label,
+            icon: c.label[0],
+            onClick: () => (window.location.hash = `${c.id}`),
+          }))}
+        />
       </nav>
 
       <aside>
-        <Actions />
+        <Shortcuts
+          side="right"
+          items={[
+            {
+              id: "0",
+              label: "Add Counter",
+              icon: "C",
+              onClick: () => show(),
+            },
+          ]}
+        />
       </aside>
 
       <main>
-        {counters.map((c) => (
-          <div key={c.id} id={c.id}>
-            {c.name}
-          </div>
-        ))}
+        <Sliders counters={counters} />
       </main>
     </div>
   );

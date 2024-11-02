@@ -2,12 +2,13 @@
 
   display: grid;
   grid-template-areas: 'n m a';
-  grid-template-columns: minmax(50px, 1fr) minmax(0px, 500px) minmax(50px, 1fr);
+  grid-template-columns: minmax(50px, 1fr) minmax(0px, 340px) minmax(50px, 1fr);
   grid-template-rows: 100%;
   height: 100vh;
   height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   margin: 0 auto;
-  padding: 0;
 
   aside {
     grid-area: a;
@@ -26,7 +27,10 @@
 
 
   main {
+    z-index: 1;
     grid-area: m;
+
+    margin: .3rem 0px;
     background: var(--bg-base);
     box-sizing: border-box;
     border: 1px solid var(--border-base);
@@ -34,22 +38,18 @@
 
     overflow: auto;
     scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
+    /* scroll-snap-type: y mandatory; */
+    scroll-snap-align: center;
+    scroll-margin: 0;
+    scroll-padding: 1rem;
 
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
     padding: 1rem;
 
-    div {
-      scroll-snap-align: center;
-      height: 300px;
-      width: 300px;
-      background: blue;
-      min-height: 300px;
-    }
 
   }
 
