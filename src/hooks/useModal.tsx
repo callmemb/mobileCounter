@@ -1,3 +1,5 @@
+import { Close } from "@mui/icons-material";
+import { Button } from "@mui/material";
 import { useRef } from "react";
 
 export type ComponentInModalPropsType = {
@@ -17,11 +19,13 @@ export default function useModal(title: string, Element: ComponentInModalType) {
     <dialog className="customModal" ref={ref}>
       <div className="header">
         <h2 className="title">{title}</h2>
-        <button className="close" onClick={hideDialog}>
-          X
-        </button>
+        <Button className="close" onClick={hideDialog}>
+          <Close />
+        </Button>
       </div>
-      <div className="content">{<Element hide={hideDialog} />}</div>
+      <div className="content">{
+        <Element hide={hideDialog} />
+        }</div>
     </dialog>
   );
 

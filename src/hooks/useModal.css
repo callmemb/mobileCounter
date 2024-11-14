@@ -7,20 +7,18 @@
     gap: 1rem;
     align-items: center;
     border-bottom: 1px solid var(--border-base);
+    margin-bottom: .8rem;
 
 
     .title {
       flex: 1;
-      padding: 0 .8rem;
+      padding: 1rem;
+      font-size: 1.2rem;
     }
 
     .close {
-      border: none;
       padding: .8rem;
-      cursor: pointer;
-      background: none;
-      border: 1px solid none;
-      transition: all 200ms linear;
+      color: var(--font-base);
 
       &:hover {
         background-color: var(--bg-base);
@@ -32,6 +30,10 @@
 
   .content {
     padding: .8rem;
+  }
+
+  dialog:not([open]) {
+    display: none;
   }
 
 }

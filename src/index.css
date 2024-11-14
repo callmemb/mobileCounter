@@ -1,34 +1,8 @@
-@import './reset.css';
 @import './App.css';
 
-@import './hooks/useModal.css';
-
-@import './components/shortcuts/styles.css';
-
-
-
-@font-face {
-  font-family: 'Regular';
-  src: local('Roboto'), url('./assets/Roboto-Regular.ttf') format('truetype')
-}
 
 :root {
-
-  --bg-base: #efefef;
-  --bg-hero: rgb(179, 255, 191);
-
-  --border-base: #ababab;
-  --border-primary: #2f4;
-
-  --font-base: #444;
-  --font-danger: #f44;
-
-
-
-}
-
-:root {
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto";
 
   background-size: 40px 40px;
   background-color: var(--bg-base);

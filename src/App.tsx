@@ -1,47 +1,30 @@
-import AddCounterForm from "./components/forms/addCounterForm";
 import Shortcuts from "./components/shortcuts/component";
-import useModal from "./hooks/useModal";
-import { useCounters } from "./store";
-import Sliders from "./containers/sliders/component";
+import Sliders from "./containers/counterSliders/component";
+import Menu from "./containers/menu/component";
+import CounterGroupLinks from "./containers/counterGroupLinks/component";
+import CounterLinks from "./containers/counterLinks/component";
 
 function App() {
-  const counters = useCounters();
-  const { dialogNode, show } = useModal("Add counter", AddCounterForm);
-
   return (
-    <div id="app">
-      {dialogNode}
+      <div id="app">
+        <nav>
+          <Shortcuts side="left">
+            <CounterLinks />
+          </Shortcuts>
+        </nav>
 
-      <nav>
-        <Shortcuts
-          side="left"
-          items={counters.map((c) => ({
-            id: `${c.id}`,
-            label: c.label,
-            icon: c.label[0],
-            onClick: () => (window.location.hash = `${c.id}`),
-          }))}
-        />
-      </nav>
+        <aside>
+          <Shortcuts side="right">
+            <Menu />
+            <hr />
+            <CounterGroupLinks />
+          </Shortcuts>
+        </aside>
 
-      <aside>
-        <Shortcuts
-          side="right"
-          items={[
-            {
-              id: "0",
-              label: "Add Counter",
-              icon: "C",
-              onClick: () => show(),
-            },
-          ]}
-        />
-      </aside>
-
-      <main>
-        <Sliders counters={counters} />
-      </main>
-    </div>
+        <main>
+          <Sliders />
+        </main>
+      </div>
   );
 }
 
