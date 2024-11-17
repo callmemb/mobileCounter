@@ -4,22 +4,14 @@ import ShortcutButton from "./components/pageTemplate/components/shortcuts/short
 function App() {
   return (
     <PageTemplate
+      label={"Counters"}
       staticOptions={[
-        // <ShortcutButton key="s1" id={"9"} icon={"a"} onClick={console.log}>short</ShortcutButton>,
-        // <ShortcutButton key="s2" id={"10"} icon={"a"} onClick={console.log}>buttons</ShortcutButton>,
-        // <ShortcutButton key="s3" id={"11"} icon={"a"} onClick={console.log}>menu</ShortcutButton>,
-        // <ShortcutButton key="s4" id={"12"} icon={"a"} onClick={console.log}>stat</ShortcutButton>,
-        <div
-          key={"sasd"}
-          style={{
-            writingMode: "vertical-rl",
-            fontSize: 40,
-            padding: "20px 0px",
-            lineHeight: 1,
-          }}
-        >
-          Add counter
-        </div>,
+        <ShortcutButton key="s1" id={"9"} icon={"a"} onClick={console.log}>
+          short
+        </ShortcutButton>,
+        <ShortcutButton key="s2" id={"10"} icon={"a"} onClick={console.log}>
+          buttons
+        </ShortcutButton>,
       ]}
       leftOptions={[
         <ShortcutButton key="l1" id={"1"} icon={"♠"} onClick={console.log}>

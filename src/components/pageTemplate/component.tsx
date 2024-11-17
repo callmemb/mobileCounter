@@ -4,6 +4,7 @@ import { Box, Paper } from "@mui/material";
 
 type PageTemplateProps = {
   children: React.ReactNode | React.ReactNode[] | undefined;
+  label: string | null;
   leftOptions?: React.ReactNode | React.ReactNode[];
   rightOptions?: React.ReactNode | React.ReactNode[];
   staticOptions?: React.ReactNode | React.ReactNode[];
@@ -11,10 +12,14 @@ type PageTemplateProps = {
 
 export const PageTemplate: React.FC<PageTemplateProps> = ({
   children = [],
+  label = null,
   leftOptions = [],
   rightOptions = [],
   staticOptions = [],
 }) => {
+  const leftRef = React.useRef<HTMLDivElement>(null);
+  const rightRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <Box
       height="100dvh"
@@ -26,6 +31,7 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
       }}
     >
       <Box
+        ref={leftRef}
         component="nav"
         sx={{
           py: 1,
@@ -38,11 +44,14 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
         }}
       >
         <Box sx={{ gridColumn: "1", position: "relative", zIndex: 3 }}>
-          <ShortcutPanel side="left">{leftOptions}</ShortcutPanel>
+          <ShortcutPanel side="left" scrollableRef={leftRef}>
+            {leftOptions}
+          </ShortcutPanel>
         </Box>
       </Box>
 
       <Box
+        ref={rightRef}
         component="aside"
         sx={{
           py: 1,
@@ -55,8 +64,23 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
         }}
       >
         <Box sx={{ gridColumn: "3", position: "relative", zIndex: 3 }}>
-          <ShortcutPanel side="right">
-            <Box sx={{ position: "sticky", top: 0 }}>{staticOptions}</Box>
+          <ShortcutPanel side="right" scrollableRef={rightRef}>
+            {staticOptions}
+            {label ? (
+              <Box
+                sx={{
+                  position: "sticky",
+                  top: 0,
+                  writingMode: "vertical-rl",
+                  fontSize: 40,
+                  padding: "20px 0px",
+                  lineHeight: 1,
+                  fontWeight: 700,
+                }}
+              >
+                {label}
+              </Box>
+            ) : null}
             <hr />
             {rightOptions}
           </ShortcutPanel>

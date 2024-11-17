@@ -9,15 +9,19 @@ import { Box } from "@mui/material";
  */
 type Props = {
   side?: "left" | "right";
+  scrollableRef?: React.RefObject<HTMLDivElement>;
   children: React.ReactNode | React.ReactNode[];
 };
+
+const SCROLL_THRESHOLD = 100; // pixels from edge that triggers scrolling
+const SCROLL_STEP = 5; // pixels to scroll per touch move event
 
 /**
  * Shortcuts component for displaying a list of shortcut buttons.
  * @param {Props} props - The component props.
  * @returns {JSX.Element} The rendered Shortcuts component.
  */
-export default function ShortcutPanel({ side = "left", children }: Props) {
+export default function ShortcutPanel({ side = "left", scrollableRef, children }: Props) {
   const [idOfHoveredItem, setIdOfHoveredItem] = useState<string | null>(null);
 
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
@@ -27,6 +31,19 @@ export default function ShortcutPanel({ side = "left", children }: Props) {
       t.clientY
     ) as HTMLElement;
     setIdOfHoveredItem(getShortcutElement(button)?.id);
+
+    if (scrollableRef?.current) {
+      const rect = scrollableRef.current.getBoundingClientRect();
+      const relativeY = t.clientY - rect.top;
+      
+      if (relativeY < SCROLL_THRESHOLD) {
+        // Near top - scroll up
+        scrollableRef.current.scrollBy(0, -SCROLL_STEP);
+      } else if (relativeY > rect.height - SCROLL_THRESHOLD) {
+        // Near bottom - scroll down
+        scrollableRef.current.scrollBy(0, SCROLL_STEP);
+      }
+    }
   };
 
   const onTouchEnd = (e: TouchEvent<HTMLElement>) => {
