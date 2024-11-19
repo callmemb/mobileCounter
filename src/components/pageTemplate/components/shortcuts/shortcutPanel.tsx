@@ -14,14 +14,18 @@ type Props = {
 };
 
 const SCROLL_THRESHOLD = 100; // pixels from edge that triggers scrolling
-const SCROLL_STEP = 5; // pixels to scroll per touch move event
+const SCROLL_STEP = 6; // pixels to scroll per touch move event
 
 /**
  * Shortcuts component for displaying a list of shortcut buttons.
  * @param {Props} props - The component props.
  * @returns {JSX.Element} The rendered Shortcuts component.
  */
-export default function ShortcutPanel({ side = "left", scrollableRef, children }: Props) {
+export default function ShortcutPanel({
+  side = "left",
+  scrollableRef,
+  children,
+}: Props) {
   const [idOfHoveredItem, setIdOfHoveredItem] = useState<string | null>(null);
 
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
@@ -35,7 +39,7 @@ export default function ShortcutPanel({ side = "left", scrollableRef, children }
     if (scrollableRef?.current) {
       const rect = scrollableRef.current.getBoundingClientRect();
       const relativeY = t.clientY - rect.top;
-      
+
       if (relativeY < SCROLL_THRESHOLD) {
         // Near top - scroll up
         scrollableRef.current.scrollBy(0, -SCROLL_STEP);
@@ -46,14 +50,27 @@ export default function ShortcutPanel({ side = "left", scrollableRef, children }
     }
   };
 
+  /**
+   * Handles the touch end event by finding and clicking the shortcut element at the touch position.
+   * Only triggers click if a valid shortcut element with an ID is found.
+   * Prevents default behavior and stops event propagation when a valid shortcut is clicked.
+   * - Preventing double clicks on Touch tap, simulating clicks.
+   * - Allowing to un-focus other elements when clicking anything but valid shortcuts.
+   * @param {TouchEvent<HTMLElement>} e - The touch end event object
+   */
   const onTouchEnd = (e: TouchEvent<HTMLElement>) => {
     const t = e.changedTouches[0];
     const button = document.elementFromPoint(
       t.clientX,
       t.clientY
     ) as HTMLElement;
-    getShortcutElement(button).element?.click();
-    setIdOfHoveredItem(null);
+    const relevantNode = getShortcutElement(button);
+    if (relevantNode.id) {
+      e.preventDefault();
+      e.stopPropagation();
+      relevantNode.element?.click?.();
+      setIdOfHoveredItem(null);
+    }
   };
 
   return (
@@ -61,7 +78,7 @@ export default function ShortcutPanel({ side = "left", scrollableRef, children }
       onTouchMove={onTouchMove}
       onTouchStart={onTouchMove}
       onTouchEnd={onTouchEnd}
-      data-shortcut-id={null}
+      data-shortcut-id={""}
       sx={{
         height: "100%",
         containerType: "inline-size",
@@ -90,6 +107,6 @@ function getShortcutElement(element: HTMLElement | null): {
 } {
   if (!element) return { element: null, id: null };
   const id = element.getAttribute("data-shortcut-id");
-  if (id || id === null) return { element, id };
+  if (typeof id === "string") return { element, id };
   return getShortcutElement(element.parentElement);
 }

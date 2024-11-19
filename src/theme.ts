@@ -6,10 +6,43 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundSize: "40px 40px",
+          backgroundPosition: "center",
+          // backgroundSize: "40px 40px",
           backgroundColor: "#efefef",
-          backgroundImage: `linear-gradient(to right, #ababab 1px,transparent 1px),
-          linear-gradient(to bottom, #ababab 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(to right top, #ddf,transparent)`,
+          "*": {
+            "&::-webkit-scrollbar": {
+              width: ".3rem",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#dfefdf",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#8c8",
+              borderRadius: "2px",
+            },
+          },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          "&.Mui-disabled": {
+            background: "#ddd",
+          },
+        },
+        outlined: {
+          backgroundColor: "#fff",
+          "&:hover": {
+            backgroundColor: "#fff",
+          },
+        },
+        text: {
+          backgroundColor: "#fff",
+          "&:hover": {
+            backgroundColor: "#fff",
+          },
         },
       },
     },

@@ -11,9 +11,9 @@ const db = new Dexie("CountersDatabase") as Dexie & {
 
 // Schema declaration:
 db.version(1).stores({
-  counters: "order, groupId, id", // simple primary key, no auto-increment
-  counterGroups: "order, id", // simple primary key, no auto-increment
-  counterActions: "date, counterId, id", // simple primary key, no auto-increment
+  counters: "id, groupId, order", // simple primary key, no auto-increment
+  counterGroups: "id, order", // simple primary key, no auto-increment
+  counterActions: "id, date, counterId", // simple primary key, no auto-increment
 });
 
 export { db };
