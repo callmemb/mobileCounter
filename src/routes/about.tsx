@@ -1,33 +1,40 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import PageTemplate from "../components/pageTemplate/component";
 import ShortcutButton from "../components/pageTemplate/components/shortcuts/shortcutButton";
-import { ArrowBack } from "@mui/icons-material";
-import { Box } from "@mui/material";
+import { ArrowLeft } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
-export const Route = createFileRoute("/404")({
+export const Route = createFileRoute("/about")({
   component: RouteComponent,
 });
 
-export default function RouteComponent() {
+function RouteComponent() {
   const navigate = useNavigate();
 
   return (
     <PageTemplate
+      label="About"
       leftOptions={[
         <ShortcutButton
           key="back"
           id="back"
-          icon={<ArrowBack />}
+          icon={<ArrowLeft />}
           color="warning"
           onClick={() => {
-            navigate({ to: "/" });
+            navigate({ to: ".." });
           }}
         >
           Back
         </ShortcutButton>,
       ]}
     >
-      <Box sx={{ textAlign: "center" }}>404</Box>
+      <Typography variant="button" sx={{
+        width: '100%',
+        textAlign: 'center',
+        display: 'block',
+      }}>
+        I'm awesome
+      </Typography>
     </PageTemplate>
   );
 }

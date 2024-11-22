@@ -11,6 +11,9 @@ const theme = createTheme({
           backgroundColor: "#efefef",
           backgroundImage: `linear-gradient(to right top, #ddf,transparent)`,
           "*": {
+            fontSmoothing: "antialiased",
+            webkitFontSmoothing: "antialiased",
+            mozOsxFontSmoothing: "grayscale",
             "&::-webkit-scrollbar": {
               width: ".3rem",
             },

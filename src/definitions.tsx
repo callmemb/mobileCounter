@@ -29,11 +29,23 @@ export const counterGroupValidator = z.object({
   order: z.coerce.string(),
 });
 
-export const counterActionValidator = z.object({
-  id: z.string(),
+export const newCounterActionValidator = z.object({
   counterId: z.string(),
   value: z.coerce.number().min(1),
+});
+
+export const counterActionValidator = z.object({
+  id: z.string(),
+  ...newCounterActionValidator.shape,
   date: z.date(),
+});
+
+export const settingsValidator = z.object({
+  id: z.string().optional(),
+  dailyStepsResetTime: z.string().time(),
+
+  // system
+  lastDailyStepResetDate: z.date(),
 });
 
 export type Counter = z.infer<typeof counterValidator>;
@@ -43,6 +55,8 @@ export type CounterAction = z.infer<typeof counterActionValidator>;
 // New types for creation (without IDs)
 export type NewCounter = z.infer<typeof newCounterValidator>;
 export type NewCounterGroup = z.infer<typeof newCounterGroupValidator>;
-export type NewCounterAction = Omit<CounterAction, "id">;
+export type NewCounterAction = z.infer<typeof newCounterActionValidator>;
 
-export type SelectOption = { value: string|number; label: string };
+export type Settings = z.infer<typeof settingsValidator>;
+
+export type SelectOption = { value: string | number; label: string };

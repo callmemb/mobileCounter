@@ -58,6 +58,7 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
               height: "100%",
               overflow: "auto",
               scrollbarWidth: "1px",
+              scrollBehavior: "smooth",
               px: 1,
               py: 2,
             }}

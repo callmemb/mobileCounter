@@ -1,18 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../components/pageTemplate/component";
-import ShortcutButton from "../components/pageTemplate/components/shortcuts/shortcutButton";
+import PageTemplate from "../../components/pageTemplate/component";
+import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
 import { ArrowLeft, CheckCircleOutline, Restore } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMemo, useRef } from "react";
-import { store, useCounterGroups } from "../store";
-import { NewCounter, newCounterValidator } from "../definitions";
-import StackLayoutForFields from "../components/form/stackLayoutForFields";
-import TextInput from "../components/form/textInput";
-import NumberInput from "../components/form/numberInput";
-import SelectInput from "../components/form/selectInput";
+import { store, useCounterGroups } from "../../store";
+import { NewCounter, newCounterValidator } from "../../definitions";
+import StackLayoutForFields from "../../components/form/stackLayoutForFields";
+import TextInput from "../../components/form/textInput";
+import NumberInput from "../../components/form/numberInput";
+import SelectInput from "../../components/form/selectInput";
 
-export const Route = createFileRoute("/addCounter")({
+export const Route = createFileRoute("/counters/new")({
   component: RouteComponent,
 });
 
@@ -35,7 +35,7 @@ function RouteComponent() {
       alert(errorMessage);
       return;
     }
-    navigate({ to: "/" });
+    navigate({ to: ".." });
   };
 
   const groupOptions = useMemo(
@@ -49,11 +49,11 @@ function RouteComponent() {
       leftOptions={[
         <ShortcutButton
           key="back"
-          id={"back"}
+          id="back"
           icon={<ArrowLeft />}
-          color="error"
+          color="warning"
           onClick={() => {
-            navigate({ to: "/" });
+            navigate({ to: ".." });
           }}
         >
           Cancel

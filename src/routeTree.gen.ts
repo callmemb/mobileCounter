@@ -11,36 +11,30 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TestImport } from './routes/test'
-import { Route as GroupViewImport } from './routes/groupView'
-import { Route as AddCounterGroupImport } from './routes/addCounterGroup'
-import { Route as AddCounterImport } from './routes/addCounter'
+import { Route as SettingsImport } from './routes/settings'
+import { Route as AboutImport } from './routes/about'
 import { Route as R404Import } from './routes/404'
 import { Route as IndexImport } from './routes/index'
+import { Route as TestIndexImport } from './routes/test/index'
+import { Route as GroupsIndexImport } from './routes/groups/index'
+import { Route as CountersIndexImport } from './routes/counters/index'
+import { Route as Test2Import } from './routes/test/2'
+import { Route as GroupsNewImport } from './routes/groups/new'
+import { Route as GroupsIdImport } from './routes/groups/$id'
+import { Route as CountersNewImport } from './routes/counters/new'
+import { Route as CountersIdImport } from './routes/counters/$id'
 
 // Create/Update Routes
 
-const TestRoute = TestImport.update({
-  id: '/test',
-  path: '/test',
+const SettingsRoute = SettingsImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRoute,
 } as any)
 
-const GroupViewRoute = GroupViewImport.update({
-  id: '/groupView',
-  path: '/groupView',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AddCounterGroupRoute = AddCounterGroupImport.update({
-  id: '/addCounterGroup',
-  path: '/addCounterGroup',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AddCounterRoute = AddCounterImport.update({
-  id: '/addCounter',
-  path: '/addCounter',
+const AboutRoute = AboutImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,6 +47,54 @@ const R404Route = R404Import.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TestIndexRoute = TestIndexImport.update({
+  id: '/test/',
+  path: '/test/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GroupsIndexRoute = GroupsIndexImport.update({
+  id: '/groups/',
+  path: '/groups/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CountersIndexRoute = CountersIndexImport.update({
+  id: '/counters/',
+  path: '/counters/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const Test2Route = Test2Import.update({
+  id: '/test/2',
+  path: '/test/2',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GroupsNewRoute = GroupsNewImport.update({
+  id: '/groups/new',
+  path: '/groups/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GroupsIdRoute = GroupsIdImport.update({
+  id: '/groups/$id',
+  path: '/groups/$id',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CountersNewRoute = CountersNewImport.update({
+  id: '/counters/new',
+  path: '/counters/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CountersIdRoute = CountersIdImport.update({
+  id: '/counters/$id',
+  path: '/counters/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,32 +116,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof R404Import
       parentRoute: typeof rootRoute
     }
-    '/addCounter': {
-      id: '/addCounter'
-      path: '/addCounter'
-      fullPath: '/addCounter'
-      preLoaderRoute: typeof AddCounterImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/addCounterGroup': {
-      id: '/addCounterGroup'
-      path: '/addCounterGroup'
-      fullPath: '/addCounterGroup'
-      preLoaderRoute: typeof AddCounterGroupImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
       parentRoute: typeof rootRoute
     }
-    '/groupView': {
-      id: '/groupView'
-      path: '/groupView'
-      fullPath: '/groupView'
-      preLoaderRoute: typeof GroupViewImport
+    '/counters/$id': {
+      id: '/counters/$id'
+      path: '/counters/$id'
+      fullPath: '/counters/$id'
+      preLoaderRoute: typeof CountersIdImport
       parentRoute: typeof rootRoute
     }
-    '/test': {
-      id: '/test'
+    '/counters/new': {
+      id: '/counters/new'
+      path: '/counters/new'
+      fullPath: '/counters/new'
+      preLoaderRoute: typeof CountersNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/groups/$id': {
+      id: '/groups/$id'
+      path: '/groups/$id'
+      fullPath: '/groups/$id'
+      preLoaderRoute: typeof GroupsIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/groups/new': {
+      id: '/groups/new'
+      path: '/groups/new'
+      fullPath: '/groups/new'
+      preLoaderRoute: typeof GroupsNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/test/2': {
+      id: '/test/2'
+      path: '/test/2'
+      fullPath: '/test/2'
+      preLoaderRoute: typeof Test2Import
+      parentRoute: typeof rootRoute
+    }
+    '/counters/': {
+      id: '/counters/'
+      path: '/counters'
+      fullPath: '/counters'
+      preLoaderRoute: typeof CountersIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/groups/': {
+      id: '/groups/'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof GroupsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/test/': {
+      id: '/test/'
       path: '/test'
       fullPath: '/test'
-      preLoaderRoute: typeof TestImport
+      preLoaderRoute: typeof TestIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -110,29 +194,47 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
-  '/addCounter': typeof AddCounterRoute
-  '/addCounterGroup': typeof AddCounterGroupRoute
-  '/groupView': typeof GroupViewRoute
-  '/test': typeof TestRoute
+  '/about': typeof AboutRoute
+  '/settings': typeof SettingsRoute
+  '/counters/$id': typeof CountersIdRoute
+  '/counters/new': typeof CountersNewRoute
+  '/groups/$id': typeof GroupsIdRoute
+  '/groups/new': typeof GroupsNewRoute
+  '/test/2': typeof Test2Route
+  '/counters': typeof CountersIndexRoute
+  '/groups': typeof GroupsIndexRoute
+  '/test': typeof TestIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
-  '/addCounter': typeof AddCounterRoute
-  '/addCounterGroup': typeof AddCounterGroupRoute
-  '/groupView': typeof GroupViewRoute
-  '/test': typeof TestRoute
+  '/about': typeof AboutRoute
+  '/settings': typeof SettingsRoute
+  '/counters/$id': typeof CountersIdRoute
+  '/counters/new': typeof CountersNewRoute
+  '/groups/$id': typeof GroupsIdRoute
+  '/groups/new': typeof GroupsNewRoute
+  '/test/2': typeof Test2Route
+  '/counters': typeof CountersIndexRoute
+  '/groups': typeof GroupsIndexRoute
+  '/test': typeof TestIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/404': typeof R404Route
-  '/addCounter': typeof AddCounterRoute
-  '/addCounterGroup': typeof AddCounterGroupRoute
-  '/groupView': typeof GroupViewRoute
-  '/test': typeof TestRoute
+  '/about': typeof AboutRoute
+  '/settings': typeof SettingsRoute
+  '/counters/$id': typeof CountersIdRoute
+  '/counters/new': typeof CountersNewRoute
+  '/groups/$id': typeof GroupsIdRoute
+  '/groups/new': typeof GroupsNewRoute
+  '/test/2': typeof Test2Route
+  '/counters/': typeof CountersIndexRoute
+  '/groups/': typeof GroupsIndexRoute
+  '/test/': typeof TestIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -140,39 +242,75 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/404'
-    | '/addCounter'
-    | '/addCounterGroup'
-    | '/groupView'
+    | '/about'
+    | '/settings'
+    | '/counters/$id'
+    | '/counters/new'
+    | '/groups/$id'
+    | '/groups/new'
+    | '/test/2'
+    | '/counters'
+    | '/groups'
     | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/404' | '/addCounter' | '/addCounterGroup' | '/groupView' | '/test'
+  to:
+    | '/'
+    | '/404'
+    | '/about'
+    | '/settings'
+    | '/counters/$id'
+    | '/counters/new'
+    | '/groups/$id'
+    | '/groups/new'
+    | '/test/2'
+    | '/counters'
+    | '/groups'
+    | '/test'
   id:
     | '__root__'
     | '/'
     | '/404'
-    | '/addCounter'
-    | '/addCounterGroup'
-    | '/groupView'
-    | '/test'
+    | '/about'
+    | '/settings'
+    | '/counters/$id'
+    | '/counters/new'
+    | '/groups/$id'
+    | '/groups/new'
+    | '/test/2'
+    | '/counters/'
+    | '/groups/'
+    | '/test/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
-  AddCounterRoute: typeof AddCounterRoute
-  AddCounterGroupRoute: typeof AddCounterGroupRoute
-  GroupViewRoute: typeof GroupViewRoute
-  TestRoute: typeof TestRoute
+  AboutRoute: typeof AboutRoute
+  SettingsRoute: typeof SettingsRoute
+  CountersIdRoute: typeof CountersIdRoute
+  CountersNewRoute: typeof CountersNewRoute
+  GroupsIdRoute: typeof GroupsIdRoute
+  GroupsNewRoute: typeof GroupsNewRoute
+  Test2Route: typeof Test2Route
+  CountersIndexRoute: typeof CountersIndexRoute
+  GroupsIndexRoute: typeof GroupsIndexRoute
+  TestIndexRoute: typeof TestIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
-  AddCounterRoute: AddCounterRoute,
-  AddCounterGroupRoute: AddCounterGroupRoute,
-  GroupViewRoute: GroupViewRoute,
-  TestRoute: TestRoute,
+  AboutRoute: AboutRoute,
+  SettingsRoute: SettingsRoute,
+  CountersIdRoute: CountersIdRoute,
+  CountersNewRoute: CountersNewRoute,
+  GroupsIdRoute: GroupsIdRoute,
+  GroupsNewRoute: GroupsNewRoute,
+  Test2Route: Test2Route,
+  CountersIndexRoute: CountersIndexRoute,
+  GroupsIndexRoute: GroupsIndexRoute,
+  TestIndexRoute: TestIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -187,10 +325,16 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/404",
-        "/addCounter",
-        "/addCounterGroup",
-        "/groupView",
-        "/test"
+        "/about",
+        "/settings",
+        "/counters/$id",
+        "/counters/new",
+        "/groups/$id",
+        "/groups/new",
+        "/test/2",
+        "/counters/",
+        "/groups/",
+        "/test/"
       ]
     },
     "/": {
@@ -199,17 +343,35 @@ export const routeTree = rootRoute
     "/404": {
       "filePath": "404.tsx"
     },
-    "/addCounter": {
-      "filePath": "addCounter.tsx"
+    "/about": {
+      "filePath": "about.tsx"
     },
-    "/addCounterGroup": {
-      "filePath": "addCounterGroup.tsx"
+    "/settings": {
+      "filePath": "settings.tsx"
     },
-    "/groupView": {
-      "filePath": "groupView.tsx"
+    "/counters/$id": {
+      "filePath": "counters/$id.tsx"
     },
-    "/test": {
-      "filePath": "test.tsx"
+    "/counters/new": {
+      "filePath": "counters/new.tsx"
+    },
+    "/groups/$id": {
+      "filePath": "groups/$id.tsx"
+    },
+    "/groups/new": {
+      "filePath": "groups/new.tsx"
+    },
+    "/test/2": {
+      "filePath": "test/2.tsx"
+    },
+    "/counters/": {
+      "filePath": "counters/index.tsx"
+    },
+    "/groups/": {
+      "filePath": "groups/index.tsx"
+    },
+    "/test/": {
+      "filePath": "test/index.tsx"
     }
   }
 }

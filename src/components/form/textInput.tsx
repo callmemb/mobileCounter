@@ -17,6 +17,9 @@ const TextInput = React.forwardRef<HTMLDivElement, Props>(
         variant="outlined"
         fullWidth
         sx={{ my: 1 }}
+        InputLabelProps={{
+          shrink: true,
+        }}
         {...props}
       />
     );

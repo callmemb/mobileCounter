@@ -1,19 +1,21 @@
 // db.ts
 import Dexie, { type EntityTable } from "dexie";
 
-import { Counter, CounterAction, CounterGroup } from "../definitions";
+import { Counter, CounterAction, CounterGroup, Settings } from "../definitions";
 
 const db = new Dexie("CountersDatabase") as Dexie & {
   counters: EntityTable<Counter, "id">;
   counterGroups: EntityTable<CounterGroup, "id">;
   counterActions: EntityTable<CounterAction, "id">;
+  settings: EntityTable<Settings, "id">;
 };
 
 // Schema declaration:
 db.version(1).stores({
-  counters: "id, groupId, order", // simple primary key, no auto-increment
-  counterGroups: "id, order", // simple primary key, no auto-increment
-  counterActions: "id, date, counterId", // simple primary key, no auto-increment
+  counters: "id, groupId, order",
+  counterGroups: "id, order",
+  counterActions: "id, date, counterId",
+  settings: "id",
 });
 
 export { db };

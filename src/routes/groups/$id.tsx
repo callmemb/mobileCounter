@@ -1,52 +1,60 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../components/pageTemplate/component";
-import ShortcutButton from "../components/pageTemplate/components/shortcuts/shortcutButton";
+import PageTemplate from "../../components/pageTemplate/component";
+import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
 import { ArrowLeft, CheckCircleOutline, Restore } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRef } from "react";
-import { store } from "../store";
-import {
-  NewCounterGroup,
-  newCounterGroupValidator,
-} from "../definitions";
-import StackLayoutForFields from "../components/form/stackLayoutForFields";
-import TextInput from "../components/form/textInput";
+import { useEffect, useRef } from "react";
+import { store, useCounterGroup } from "../../store";
+import { Counter, newCounterValidator } from "../../definitions";
+import StackLayoutForFields from "../../components/form/stackLayoutForFields";
+import TextInput from "../../components/form/textInput";
 
-export const Route = createFileRoute("/addCounterGroup")({
+export const Route = createFileRoute("/groups/$id")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { id } = Route.useParams();
+
+  const group = useCounterGroup(id);
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
   const {
     reset,
     register,
+
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<NewCounterGroup>({
-    resolver: zodResolver(newCounterGroupValidator),
+  } = useForm<Counter>({
+    resolver: zodResolver(newCounterValidator),
+    defaultValues: group,
   });
-  const onSubmit = async (data: NewCounterGroup) => {
-    const { errorMessage } = await store.upsertCounterGroup(data);
+
+  useEffect(() => {
+    reset(group);
+  }, [group, reset]);
+
+  const onSubmit = async (data: Counter) => {
+    const { errorMessage } = await store.upsertCounter({ ...group, ...data });
     if (errorMessage) {
       alert(errorMessage);
+      return;
     }
-    navigate({ to: "/" });
+    navigate({ to: ".." });
   };
 
   return (
     <PageTemplate
-      label="Add Group"
+      label="Edit Counter"
       leftOptions={[
         <ShortcutButton
           key="back"
-          id={"back"}
+          id="back"
           icon={<ArrowLeft />}
-          color="error"
+          color="warning"
           onClick={() => {
-            navigate({ to: "/groupView" });
+            navigate({ to: ".." });
           }}
         >
           Cancel
@@ -59,7 +67,7 @@ function RouteComponent() {
           icon={<Restore />}
           color="warning"
           onClick={() => {
-            reset();
+            reset(group);
           }}
         >
           Reset

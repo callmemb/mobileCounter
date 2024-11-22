@@ -9,18 +9,23 @@ import {
   NewCounter,
   NewCounterAction,
   NewCounterGroup,
+  Settings,
 } from "./definitions";
 import { db } from "./store/indexDB";
 import { v4 as genId } from "uuid";
 import { generateKeyBetween } from "./lib/generateKeyBetween";
+import dayjs from "dayjs";
 
-type StoreResponse = {
+type StoreResponse<T> = {
   errorMessage?: string;
-  id?: string;
+  id?: T extends { id: string } ? T["id"] : string;
+  record?: T;
 };
 
 class Store {
-  async upsertCounter(record: NewCounter | Counter): Promise<StoreResponse> {
+  async upsertCounter(
+    record: NewCounter | Counter
+  ): Promise<StoreResponse<Counter>> {
     try {
       let defaults = {};
       if (!("id" in record)) {
@@ -41,7 +46,7 @@ class Store {
         };
       }
       await db.counters.put(validatedRecord);
-      return { id: validatedRecord.id };
+      return { id: validatedRecord.id, record: validatedRecord };
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
@@ -49,7 +54,7 @@ class Store {
       };
     }
   }
-  async deleteCounter(id: Counter["id"]): Promise<StoreResponse> {
+  async deleteCounter(id: Counter["id"]): Promise<StoreResponse<Counter>> {
     try {
       await db.counterActions.where("counterId").equals(id).delete();
       await db.counters.delete(id);
@@ -63,7 +68,7 @@ class Store {
   }
   async upsertCounterGroup(
     record: NewCounterGroup | CounterGroup
-  ): Promise<StoreResponse> {
+  ): Promise<StoreResponse<CounterGroup>> {
     try {
       let defaults = {};
       if (!("id" in record)) {
@@ -77,7 +82,7 @@ class Store {
         ...defaults,
       });
       await db.counterGroups.put(validatedRecord);
-      return { id: validatedRecord.id };
+      return { id: validatedRecord.id, record: validatedRecord };
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
@@ -85,7 +90,9 @@ class Store {
       };
     }
   }
-  async deleteCounterGroup(id: CounterGroup["id"]): Promise<StoreResponse> {
+  async deleteCounterGroup(
+    id: CounterGroup["id"]
+  ): Promise<StoreResponse<CounterGroup>> {
     try {
       const relevantCounters = await db.counters
         .where("groupId")
@@ -105,32 +112,33 @@ class Store {
   }
 
   async addCounterAction(
-    record: NewCounterAction | CounterAction
-  ): Promise<StoreResponse> {
+    record: NewCounterAction
+  ): Promise<StoreResponse<CounterAction>> {
     try {
-      const id = "id" in record ? record.id : genId();
       const validatedRecord = counterActionValidator.parse({
+        id: genId(),
+        date: new Date(),
         ...record,
-        id,
       });
       const counter = await db.counters.get(validatedRecord.counterId);
       if (counter) {
         counter.currentSteps += validatedRecord.value / counter.unitsInStep;
         await db.counters.put(counter);
       } else {
-        return { errorMessage: "Counter not found", id: validatedRecord.id };
+        return { errorMessage: "Counter not found" };
       }
       await db.counterActions.put(validatedRecord);
-      return { id: validatedRecord.id };
+      return { id: validatedRecord.id, record: validatedRecord };
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
-        id: "id" in record ? record.id : undefined,
       };
     }
   }
 
-  async deleteCounterAction(id: CounterAction["id"]): Promise<StoreResponse> {
+  async deleteCounterAction(
+    id: CounterAction["id"]
+  ): Promise<StoreResponse<CounterAction>> {
     try {
       const counterAction = await db.counterActions.get(id);
       if (!counterAction) {
@@ -138,8 +146,10 @@ class Store {
       }
       const counter = await db.counters.get(counterAction.counterId);
       if (counter) {
-        counter.currentSteps += counterAction.value / counter.unitsInStep;
-        await db.counters.put(counter);
+        if (dayjs().isSame(dayjs(counterAction.date), "day")) {
+          counter.currentSteps -= counterAction.value / counter.unitsInStep;
+          await db.counters.put(counter);
+        }
       } else {
         return { errorMessage: "Counter not found", id: id };
       }
@@ -153,94 +163,112 @@ class Store {
     }
   }
 
-  async addValueToCounter(
-    id: Counter["id"],
-    value: number
-  ): Promise<StoreResponse> {
-    try {
-      const counter = await db.counters.get(id);
-      if (!counter || !id) {
-        return { errorMessage: "Counter not found", id };
+  async moveCounter(
+    counterId: Counter["id"],
+    afterCounterId?: Counter["id"],
+    beforeCounterId?: Counter["id"]
+  ): Promise<StoreResponse<Counter>> {
+    const counter = await db.counters.get(counterId);
+    if (!counter) {
+      return { errorMessage: "Counter not found" };
+    }
+    let orderBefore: string | null = null;
+    if (afterCounterId) {
+      const afterCounter = await db.counters.get(afterCounterId);
+      if (!afterCounter) {
+        return { errorMessage: "After Counter not found" };
       }
-      counter.currentSteps += value / counter.unitsInStep;
-      const action = {
-        counterId: id,
-        value,
-        date: new Date(),
-      };
-      await this.upsertCounter(counter);
-      const actionId = await this.addCounterAction(action);
-      return { id: actionId.id };
+      orderBefore = afterCounter.order;
+    }
+    let orderAfter: string | null = null;
+    if (beforeCounterId) {
+      const beforeCounter = await db.counters.get(beforeCounterId);
+      if (!beforeCounter) {
+        return { errorMessage: "Before Counter not found" };
+      }
+      orderAfter = beforeCounter.order;
+    }
+    const order = generateKeyBetween(orderBefore, orderAfter);
+    const record = { ...counter, order };
+    await db.counters.put(record);
+    return { id: counter.id, record };
+  }
+
+  async moveCounterGroup(
+    counterGroupId: CounterGroup["id"],
+    afterCounterGroupId?: CounterGroup["id"],
+    beforeCounterGroupId?: CounterGroup["id"]
+  ): Promise<StoreResponse<CounterGroup>> {
+    const counterGroup = await db.counterGroups.get(counterGroupId);
+    if (!counterGroup) {
+      return { errorMessage: "CounterGroup not found" };
+    }
+    let orderBefore: string | null = null;
+    if (afterCounterGroupId) {
+      const afterCounterGroup = await db.counterGroups.get(afterCounterGroupId);
+      if (!afterCounterGroup) {
+        return { errorMessage: "After CounterGroup not found" };
+      }
+      orderBefore = afterCounterGroup.order;
+    }
+    let orderAfter: string | null = null;
+    if (beforeCounterGroupId) {
+      const beforeCounterGroup =
+        await db.counterGroups.get(beforeCounterGroupId);
+      if (!beforeCounterGroup) {
+        return { errorMessage: "Before CounterGroup not found" };
+      }
+      orderAfter = beforeCounterGroup.order;
+    }
+    const order = generateKeyBetween(orderBefore, orderAfter);
+    const record = { ...counterGroup, order };
+    await db.counterGroups.put(record);
+    return { id: counterGroup.id, record };
+  }
+
+  async upsertSettings(record: Settings): Promise<StoreResponse<Settings>> {
+    try {
+      await db.settings.put({ id: "0", ...record });
+      return { record };
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
-        id,
       };
     }
   }
 
-  async removeActionFromCounter(
-    id: CounterAction["id"]
-  ): Promise<StoreResponse> {
-    try {
-      if (!id) {
-        return { errorMessage: "No action ID provided" };
-      }
-      const action = await db.counterActions.get(id);
-      if (!action) {
-        return { errorMessage: "Action not found", id };
-      }
-      const counter = await db.counters.get(action.counterId);
-      if (!counter) {
-        return { errorMessage: "Counter not found", id };
-      }
-      const editedCounter = {
-        ...counter,
-        currentSteps: action.value / counter.unitsInStep,
-      };
-      await this.upsertCounter(editedCounter);
-      await this.deleteCounterAction(id);
-      return { id };
-    } catch (error) {
-      return {
-        errorMessage: error instanceof Error ? error.message : "Unknown error",
-        id,
-      };
-    }
-  }
-
-  async moveCounter(after:string,before:string){
-    const afterCounter = await db.counters.get(after);
-    const beforeCounter = await db.counters.get(before);
-    if(!afterCounter || !beforeCounter){
-      return {errorMessage:"Counter not found"};
-    }
-    const order = generateKeyBetween(afterCounter.order,beforeCounter.order);
-    afterCounter.order = order;
-    await db.counters.put(afterCounter);
-    return {id:after};
-
+  async clearAllCurrentSteps() {
+    await db.counters.toCollection().modify({ currentSteps: 0 });
   }
 }
-
 export const store = new Store();
+
+export function useCounter(id: Counter["id"]) {
+  return useLiveQuery(() => db.counters.get(id), [id]);
+}
 
 export function useCounters(groupId: CounterGroup["id"] | null) {
   return (
     useLiveQuery(
       () =>
         typeof groupId !== "string"
-          ? db.counters.toArray()
+          ? db.counters.orderBy("order").toArray()
           : db.counters
               .where("groupId")
               .equals(groupId || "")
-              .toArray(),
+              .and((counter) => counter.order !== undefined)
+              .sortBy("order"),
       [groupId]
     ) || []
   );
 }
+
+export function useCounterGroup(id: CounterGroup["id"]) {
+  return useLiveQuery(() => db.counterGroups.get(id), [id]);
+}
+
 export function useCounterGroups() {
-  return useLiveQuery(() => db.counterGroups.toArray()) || [];
+  return useLiveQuery(() => db.counterGroups.orderBy("order").toArray()) || [];
 }
 // export function useCounterActions() {
 //   return useLiveQuery(() => db.counterActions.toArray()) || [];
