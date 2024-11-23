@@ -322,6 +322,9 @@ export default function CircularSlider({
       </Box>
 
       <Box // input
+        onFocus={() => {
+          containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
         sx={{
           opacity: 0,
           position: "absolute",
