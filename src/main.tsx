@@ -7,13 +7,11 @@ import { routeTree } from "./routeTree.gen";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import theme from "./theme.ts";
 
-import { resetCountersStepsDaily } from "./lib/resetCountersStepsDaily.ts";
-resetCountersStepsDaily();
-
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+import SettingsManager from "./settingsManager/component.tsx";
 
 export const Route = createRouter({ routeTree });
 
@@ -25,6 +23,7 @@ declare module "@tanstack/react-router" {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <SettingsManager />
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <RouterProvider router={Route} />

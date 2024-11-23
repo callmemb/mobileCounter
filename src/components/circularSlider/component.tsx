@@ -1,10 +1,11 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button, Fab, Typography, useTheme } from "@mui/material";
+import { Box, Button, Fab, Tooltip, Typography, useTheme } from "@mui/material";
 import { useCallback, useMemo, useRef, useState } from "react";
 import ArmHoldingTrigger from "./armHoldingTrigger";
 import ProgressBar from "./progressBar";
 
 import "./cssDynamicVariables";
+import CounterValueInput from "./counterValueInput";
 
 const MIN_DEG = 0;
 const MAX_DEG = 270;
@@ -13,7 +14,7 @@ const MIN_MAX_DEG_DELTA = MAX_DEG - MIN_DEG;
 const BREAKING_POINT_TO_LOOP_DEG_BACK_TO_ZERO = MAX_DEG + (360 - MAX_DEG) / 2;
 
 type CircularSliderProps = {
-  onChange?: (value: number) => void;
+  onChange: (value: number) => void;
   stepsGoal: number;
   cumulatedSteps: number;
   defaultStep: number;
@@ -26,6 +27,7 @@ type CircularSliderProps = {
   tools: {
     id: string;
     icon: React.ReactNode;
+    label: string;
     action: () => void;
   }[];
 };
@@ -114,29 +116,31 @@ export default function CircularSlider({
 
   const toolsWithRotation = useMemo(() => {
     const gap = 90 / (tools.length + 1);
-    return tools.map(({ id, icon, action }, i) => {
+    return tools.map(({ id, label, icon, action }, i) => {
       return (
         <ArmHoldingTrigger
           key={id}
           stepInDeg={(i + 0.8) * -gap}
           triggerButton={
-            <Button
-              variant="outlined"
-              color="info"
-              size="small"
-              sx={{
-                padding: 0.8,
-                minWidth: 0,
-                borderColor: theme.palette.grey[300],
-                borderRadius: "50%",
-                "&:hover": {
-                  borderColor: theme.palette.info.main,
-                },
-              }}
-              onClick={action}
-            >
-              {icon}
-            </Button>
+            <Tooltip title={label}>
+              <Button
+                variant="outlined"
+                color="info"
+                size="small"
+                sx={{
+                  padding: 0.8,
+                  minWidth: 0,
+                  borderColor: theme.palette.grey[300],
+                  borderRadius: "50%",
+                  "&:hover": {
+                    borderColor: theme.palette.info.main,
+                  },
+                }}
+                onClick={action}
+              >
+                {icon}
+              </Button>
+            </Tooltip>
           }
         />
       );
@@ -259,7 +263,7 @@ export default function CircularSlider({
           { color: theme.palette.info.main, value: `var(--value2-deg)` },
           {
             color: theme.palette.primary.main,
-            value: `calc( var(--value2-deg) + var(--value-deg))`,
+            value: `calc( min(var(--value2-deg) + var(--value-deg) , ${MAX_DEG}deg) )`,
           },
         ]}
         sx={{
@@ -270,6 +274,7 @@ export default function CircularSlider({
       />
 
       <Box // value
+        aria-hidden
         sx={{
           position: "absolute",
           display: "grid",
@@ -284,7 +289,8 @@ export default function CircularSlider({
             + {stepValue} {unitName}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {cumulatedSteps * stepSize + stepValue} / {stepsGoal * stepSize}
+            {cumulatedSteps * stepSize + stepValue} / {stepsGoal * stepSize}{" "}
+            {unitName}
           </Typography>
         </Box>
       </Box>
@@ -308,14 +314,14 @@ export default function CircularSlider({
         <Box>
           <Typography variant="h6">{label}</Typography>
           <Typography variant="caption" color="text.secondary">
-            {cumulatedSteps > stepsGoal
+            {cumulatedSteps >= stepsGoal
               ? "Goal reached"
-              : `${cumulatedSteps * stepSize} / ${stepsGoal * stepSize}`}
+              : `${cumulatedSteps * stepSize} / ${stepsGoal * stepSize} ${unitName}`}
           </Typography>
         </Box>
       </Box>
 
-      {/* <Box // input
+      <Box // input
         sx={{
           opacity: 0,
           position: "absolute",
@@ -325,16 +331,32 @@ export default function CircularSlider({
           aspectRatio: 1,
           background: theme.palette.background.paper,
           transition: "opacity 0.5s",
-          width: "85%",
+          width: "80%",
           overflow: "hidden",
-          "&:focus, &:active": {
+          ">*": {
+            transition: "top 0.5s",
+            pointerEvents: "none",
+            position: "absolute",
+            top: "150%",
+            transform: "translateY(-50%)",
+          },
+          "&:focus-within": {
             opacity: 1,
-          }
+            ">*": {
+              top: "50%",
+            },
+          },
         }}
-        tabIndex={1}
       >
-        <TextField />
-      </Box> */}
+        <CounterValueInput
+          label={label}
+          minStep={minStep}
+          maxStep={maxStep}
+          stepSize={stepSize}
+          defaultStep={defaultStep}
+          onChange={onChange}
+        />
+      </Box>
 
       <ArmHoldingTrigger
         stepInDeg={stepInDeg}
@@ -348,9 +370,15 @@ export default function CircularSlider({
             size="small"
             sx={{
               ...(isDragging
-                ? { transform: "scale(.7)" }
-                : { transform: "scale(1)" }),
-              transition: "transform 0.5s",
+                ? {
+                    transform: "scale(.7)",
+                    cursor: "initial",
+                    "&:hover": {
+                      background: theme.palette.primary.main,
+                    },
+                  }
+                : { transform: "scale(1)", cursor: "grabbing" }),
+              transition: "transform 0.5s, background 0.5s",
             }}
           >
             <Add />

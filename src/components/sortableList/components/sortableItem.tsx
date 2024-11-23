@@ -7,6 +7,7 @@ import type {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Box, Button } from "@mui/material";
+import { DragIndicator } from "@mui/icons-material";
 
 interface Props {
   id: UniqueIdentifier;
@@ -51,6 +52,7 @@ export default function SortableItem({
     <SortableItemContext.Provider value={context}>
       <Box
         ref={setNodeRef}
+        id={`${id}`}
         sx={{
           opacity: isDragging ? 0.4 : undefined,
           transform: CSS.Translate.toString(transform),
@@ -80,18 +82,18 @@ export function DragHandle() {
       variant="outlined"
       {...attributes}
       {...listeners}
-      sx={{
-        alignItems: "center",
-        justifyContent: "center",
-        touchAction: "none",
-        appearance: "none",
-        minWidth: "32px",
-      }}
+      sx={
+        {
+          alignItems: "center",
+          justifyContent: "center",
+          touchAction: "none",
+          appearance: "none",
+          minWidth: "32px",
+        }
+      }
       ref={ref}
     >
-      <svg viewBox="0 0 20 20" width="12">
-        <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
-      </svg>
+      <DragIndicator fontSize='inherit' />
     </Button>
   );
 }

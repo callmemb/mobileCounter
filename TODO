@@ -1,0 +1,19 @@
+
+poprawić scroll na ShortcutButtons
+
+wyświetlanie akcji countera, i możliwość ich kasowania.
+
+dodac ikony do grup i counterów
+
+agregowanie dniowe akcji i pokazanie grafu.
+
+możliwość wyboru countera by pokazywał się w dane dni tygodnia.
+
+dodac typy akcji countera, umożliwi to dodanie statystyk ile kto co skipuje.
+done, skip, forgot, 
+obręcze na zegarze reprezentujące typy akcji w procentach.
+wszystkie typy sumuja cię do current steps, + dodać propsy dla reszty typów.
+
+
+
+backupy db, do JSON. może kiedyś na server

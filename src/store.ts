@@ -10,6 +10,7 @@ import {
   NewCounterAction,
   NewCounterGroup,
   Settings,
+  settingsValidator,
 } from "./definitions";
 import { db } from "./store/indexDB";
 import { v4 as genId } from "uuid";
@@ -56,9 +57,14 @@ class Store {
   }
   async deleteCounter(id: Counter["id"]): Promise<StoreResponse<Counter>> {
     try {
-      await db.counterActions.where("counterId").equals(id).delete();
-      await db.counters.delete(id);
-      return { id };
+      return await db
+        .transaction("rw", db.counterActions, db.counters, async () => {
+          await db.counterActions.where("counterId").equals(id).delete();
+          await db.counters.delete(id);
+        })
+        .then(() => {
+          return { id };
+        });
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
@@ -94,15 +100,20 @@ class Store {
     id: CounterGroup["id"]
   ): Promise<StoreResponse<CounterGroup>> {
     try {
-      const relevantCounters = await db.counters
-        .where("groupId")
-        .equals(`${id}`)
-        .toArray();
-      await Promise.all(
-        relevantCounters.map((counter) => this.deleteCounter(counter.id))
-      );
-      await db.counterGroups.delete(id);
-      return { id };
+      return await db
+        .transaction("rw", db.counters, db.counterGroups, async () => {
+          const relevantCounters = await db.counters
+            .where("groupId")
+            .equals(`${id}`)
+            .toArray();
+          await Promise.all(
+            relevantCounters.map((counter) => this.deleteCounter(counter.id))
+          );
+          await db.counterGroups.delete(id);
+        })
+        .then(() => {
+          return { id };
+        });
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
@@ -145,16 +156,34 @@ class Store {
         return { errorMessage: "Action not found", id };
       }
       const counter = await db.counters.get(counterAction.counterId);
-      if (counter) {
-        if (dayjs().isSame(dayjs(counterAction.date), "day")) {
-          counter.currentSteps -= counterAction.value / counter.unitsInStep;
-          await db.counters.put(counter);
-        }
-      } else {
+      if (!counter) {
         return { errorMessage: "Counter not found", id: id };
       }
-      await db.counterActions.delete(id);
-      return { id };
+      const settings = await db.settings.get("0");
+      return await db
+        .transaction("rw", db.counters, db.counterActions, async () => {
+          if (settings?.dailyStepsResetTime) {
+            // check if action is in the same day.
+            const [hh, mm, ss] = settings.dailyStepsResetTime.split(":");
+            const tmp = dayjs().set("h", +hh).set("m", +mm).set("s", +ss);
+            const dailyStepsBreakpointTime = tmp.isAfter(dayjs())
+              ? tmp.subtract(1, "d")
+              : tmp;
+            if (dailyStepsBreakpointTime.isBefore(counterAction.date)) {
+              const newCurrentSteps =
+                counter.currentSteps -
+                counterAction.value / counter.unitsInStep;
+              await db.counters.put({
+                ...counter,
+                currentSteps: newCurrentSteps,
+              });
+            }
+          }
+          await db.counterActions.delete(id);
+        })
+        .then(() => {
+          return { id };
+        });
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
@@ -228,7 +257,12 @@ class Store {
 
   async upsertSettings(record: Settings): Promise<StoreResponse<Settings>> {
     try {
-      await db.settings.put({ id: "0", ...record });
+      const validatedRecord = settingsValidator.parse({
+        lastDailyStepsReset: dayjs().subtract(2, "d").toDate(),
+        ...record,
+        id: "0",
+      });
+      await db.settings.put(validatedRecord);
       return { record };
     } catch (error) {
       return {
@@ -238,7 +272,10 @@ class Store {
   }
 
   async clearAllCurrentSteps() {
-    await db.counters.toCollection().modify({ currentSteps: 0 });
+    return await db.transaction("rw", db.counters, db.settings, async () => {
+      await db.counters.toCollection().modify({ currentSteps: 0 });
+      await db.settings.update("0", { lastDailyStepResetDate: new Date() });
+    });
   }
 }
 export const store = new Store();
@@ -263,13 +300,21 @@ export function useCounters(groupId: CounterGroup["id"] | null) {
   );
 }
 
-export function useCounterGroup(id: CounterGroup["id"]) {
-  return useLiveQuery(() => db.counterGroups.get(id), [id]);
+export function useCounterGroup(id: CounterGroup["id"] | null) {
+  return useLiveQuery(() => (id ? db.counterGroups.get(id) : undefined), [id]);
 }
 
 export function useCounterGroups() {
   return useLiveQuery(() => db.counterGroups.orderBy("order").toArray()) || [];
 }
-// export function useCounterActions() {
-//   return useLiveQuery(() => db.counterActions.toArray()) || [];
-// }
+export function useCounterActions(counterId: Counter["id"]) {
+  return (
+    useLiveQuery(() =>
+      db.counterActions.where("counterId").equals(counterId).toArray()
+    ) || []
+  );
+}
+
+export function useSettings() {
+  return useLiveQuery(() => db.settings.get("0"), []);
+}

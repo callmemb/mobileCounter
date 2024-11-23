@@ -4,8 +4,9 @@ import ShortcutButton from "../../components/pageTemplate/components/shortcuts/s
 import { AddCircle, ArrowLeft, Delete, Edit } from "@mui/icons-material";
 import { store, useCounterGroups } from "../../store";
 import { SortableList } from "../../components/sortableList/component";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
+import ConfirmationDialog from "../../components/confirmDialog/component";
 
 export const Route = createFileRoute("/groups/")({
   component: RouteComponent,
@@ -28,6 +29,7 @@ function RouteComponent() {
         <ShortcutButton
           key="addCounterGroup"
           id={"addCounterGroup"}
+          color="info"
           icon={<AddCircle />}
           onClick={() => navigate({ to: "/groups/new" })}
         >
@@ -40,7 +42,7 @@ function RouteComponent() {
           id={g.id}
           icon={g.label[0]}
           onClick={() => {
-            document.getElementById(g.id)?.scrollIntoView();
+            document.getElementById(g.id)?.scrollIntoView({block: "center"});
           }}
         >
           {g.label}
@@ -71,7 +73,7 @@ function RouteComponent() {
             <Box sx={{ width: "100%" }}>
               <Box sx={{ display: "flex" }}>
                 <Typography
-                  variant="button"
+                  variant="subtitle1"
                   sx={{
                     display: "block",
                     flex: 1,
@@ -84,24 +86,36 @@ function RouteComponent() {
                 <SortableList.DragHandle />
               </Box>
               <Stack direction="row" spacing={1}>
-                <IconButton
-                  color="warning"
-                  aria-label="delete"
-                  onClick={() => {
-                    store.deleteCounter(group.id);
+                <ConfirmationDialog
+                  title="Delete Group"
+                  description="Are you sure you want to delete this group?"
+                  response={() => {
+                    store.deleteCounterGroup(group.id);
                   }}
+                  confirmButtonProps={{ color: "error" }}
                 >
-                  <Delete fontSize="inherit" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  color="info"
-                  onClick={() => {
-                    navigate({ to: `/groups/${group.id}` });
-                  }}
-                >
-                  <Edit fontSize="inherit" />
-                </IconButton>
+                  {(showDialog) => (
+                    <Tooltip title="Delete">
+                      <IconButton
+                        color="warning"
+                        aria-label="delete"
+                        onClick={showDialog}
+                      >
+                        <Delete fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </ConfirmationDialog>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="info"
+                    onClick={() => {
+                      navigate({ to: `/groups/${group.id}` });
+                    }}
+                  >
+                    <Edit fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
               </Stack>
             </Box>
           </SortableList.Item>

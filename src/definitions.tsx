@@ -6,7 +6,7 @@ export const newCounterValidator = z.object({
   maxNumberOfSteps: z.coerce.number().min(1),
   unitsInStep: z.coerce.number().min(1),
   dailyGoalOfSteps: z.coerce.number().min(1),
-  unitsName: z.string().min(1),
+  unitsName: z.string().optional(),
   groupId: z.string().min(1),
 });
 
@@ -40,12 +40,15 @@ export const counterActionValidator = z.object({
   date: z.date(),
 });
 
+export const dayLabelFromOptions = ["startOfRange", "endOfRange"] as const;
+
 export const settingsValidator = z.object({
   id: z.string().optional(),
-  dailyStepsResetTime: z.string().time(),
+  dailyStepsResetTime: z.string().time({ precision: 0 }),
+  dayLabelFrom: z.enum(dayLabelFromOptions),
 
   // system
-  lastDailyStepResetDate: z.date(),
+  lastDailyStepResetDate: z.date().optional(),
 });
 
 export type Counter = z.infer<typeof counterValidator>;

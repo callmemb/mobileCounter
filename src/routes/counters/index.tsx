@@ -4,15 +4,16 @@ import ShortcutButton from "../../components/pageTemplate/components/shortcuts/s
 import {
   AddCircle,
   ArrowLeft,
-  AutoGraph,
   Delete,
   Edit,
+  Info,
 } from "@mui/icons-material";
 import { store, useCounterGroups, useCounters } from "../../store";
 import { SortableList } from "../../components/sortableList/component";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Counter } from "../../definitions";
+import ConfirmationDialog from "../../components/confirmDialog/component";
 
 export const Route = createFileRoute("/counters/")({
   component: RouteComponent,
@@ -54,7 +55,7 @@ function RouteComponent() {
           id={g.id}
           icon={g.label[0]}
           onClick={() => {
-            document.getElementById(g.id)?.scrollIntoView();
+            document.getElementById(g.id)?.scrollIntoView({block: "center"});
           }}
         >
           {g.label}
@@ -85,7 +86,7 @@ function RouteComponent() {
             <Box sx={{ width: "100%" }}>
               <Box sx={{ display: "flex" }}>
                 <Typography
-                  variant="button"
+                  variant="subtitle1"
                   sx={{
                     display: "block",
                     flex: 1,
@@ -99,27 +100,52 @@ function RouteComponent() {
               </Box>
               <Typography variant="caption">{counter.groupName}</Typography>
               <Stack direction="row" spacing={1}>
-                <IconButton
-                  color="warning"
-                  aria-label="delete"
-                  onClick={() => {
+                <ConfirmationDialog
+                  title="Delete Counter"
+                  description="Are you sure you want to delete this group?"
+                  response={() => {
                     store.deleteCounter(counter.id);
                   }}
+                  confirmButtonProps={{ color: "error" }}
                 >
-                  <Delete fontSize="inherit" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  color="info"
-                  onClick={() => {
-                    navigate({ to: `/counters/${counter.id}` });
-                  }}
-                >
-                  <Edit fontSize="inherit" />
-                </IconButton>
-                <IconButton size="small" color="info">
-                  <AutoGraph fontSize="inherit" />
-                </IconButton>
+                  {(showDialog) => (
+                    <Tooltip title="Delete">
+                      <IconButton
+                        color="warning"
+                        aria-label="delete"
+                        onClick={showDialog}
+                      >
+                        <Delete fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </ConfirmationDialog>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="info"
+                    onClick={() => {
+                      navigate({
+                        to: `/counters/$id/edit`,
+                        params: { id: counter.id },
+                      });
+                    }}
+                  >
+                    <Edit fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="More info">
+                  <IconButton
+                    color="info"
+                    onClick={() => {
+                      navigate({
+                        to: `/counters/$id`,
+                        params: { id: counter.id },
+                      });
+                    }}
+                  >
+                    <Info fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
               </Stack>
             </Box>
           </SortableList.Item>

@@ -4,7 +4,7 @@ import ShortcutButton from "../components/pageTemplate/components/shortcuts/shor
 import {
   AvTimer,
   Description,
-  Edit,
+  Info,
   InfoOutlined,
   Settings,
   TextSnippet,
@@ -102,7 +102,7 @@ function RouteComponent() {
             id={c.id}
             icon={c.label[0]}
             onClick={() => {
-              document.getElementById(c.id)?.scrollIntoView();
+              document.getElementById(c.id)?.scrollIntoView({block: "center"});
             }}
           >
             {c.label}
@@ -110,7 +110,7 @@ function RouteComponent() {
         )),
       ]}
     >
-      <Stack gap={5} alignItems={"center"}>
+      <Stack gap={5} py='1rem' alignItems={"center"}>
         {counters.map((c) => (
           <CircularSliderWithActionMemory
             key={c.id}
@@ -159,6 +159,7 @@ function CircularSliderWithActionMemory({
               {
                 id: "undo",
                 icon: <Undo />,
+                label: "Undo last change",
                 action: () => {
                   const lastAction = actions[actions.length - 1];
                   const newActions = actions.slice(0, -1);
@@ -171,8 +172,9 @@ function CircularSliderWithActionMemory({
             ]
           : []),
         {
-          id: "edit",
-          icon: <Edit color="info" />,
+          id: "info",
+          label: "More info",
+          icon: <Info color="info" />,
           action: () => navigate({ to: "/counters/$id", params: { id: c.id } }),
         },
       ]}

@@ -1,4 +1,4 @@
-import { useState, TouchEvent } from "react";
+import { useState, TouchEvent, useEffect } from "react";
 import { ShortcutContext } from "./shortcutContext";
 import { Box } from "@mui/material";
 
@@ -14,7 +14,6 @@ type Props = {
 };
 
 const SCROLL_THRESHOLD = 100; // pixels from edge that triggers scrolling
-const SCROLL_STEP = 6; // pixels to scroll per touch move event
 
 /**
  * Shortcuts component for displaying a list of shortcut buttons.
@@ -28,6 +27,32 @@ export default function ShortcutPanel({
 }: Props) {
   const [idOfHoveredItem, setIdOfHoveredItem] = useState<string | null>(null);
 
+  // -10 to 10 -> speed of scrolling
+  const [scrolling, setScrolling] = useState(0);
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const doScrolling = () => {
+      if (scrolling !== 0 && scrollableRef?.current) {
+        scrollableRef.current.scrollBy({
+          top: scrolling,
+          behavior: "auto", // Changed to auto since we're handling the smoothing ourselves
+        });
+        animationFrameId = requestAnimationFrame(doScrolling);
+      }
+    };
+
+    if (scrolling !== 0) {
+      animationFrameId = requestAnimationFrame(doScrolling);
+    }
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [scrolling, scrollableRef]);
+
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
     const t = e.touches[0];
     const button = document.elementFromPoint(
@@ -39,13 +64,14 @@ export default function ShortcutPanel({
     if (scrollableRef?.current) {
       const rect = scrollableRef.current.getBoundingClientRect();
       const relativeY = t.clientY - rect.top;
-
       if (relativeY < SCROLL_THRESHOLD) {
         // Near top - scroll up
-        scrollableRef.current.scrollBy(0, -SCROLL_STEP);
+        setScrolling(-10 + (relativeY / SCROLL_THRESHOLD) * 10);
       } else if (relativeY > rect.height - SCROLL_THRESHOLD) {
         // Near bottom - scroll down
-        scrollableRef.current.scrollBy(0, SCROLL_STEP);
+        setScrolling(10 - ((rect.height - relativeY) / SCROLL_THRESHOLD) * 10);
+      } else {
+        setScrolling(0);
       }
     }
   };
@@ -71,6 +97,7 @@ export default function ShortcutPanel({
       relevantNode.element?.click?.();
       setIdOfHoveredItem(null);
     }
+    setScrolling(0);
   };
 
   return (
@@ -83,6 +110,7 @@ export default function ShortcutPanel({
         height: "100%",
         containerType: "inline-size",
         touchAction: "none",
+        scrollBehavior: "smooth",
       }}
     >
       <ShortcutContext.Provider value={{ idOfHoveredItem, side }}>

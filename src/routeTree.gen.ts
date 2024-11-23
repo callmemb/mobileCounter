@@ -18,11 +18,11 @@ import { Route as IndexImport } from './routes/index'
 import { Route as TestIndexImport } from './routes/test/index'
 import { Route as GroupsIndexImport } from './routes/groups/index'
 import { Route as CountersIndexImport } from './routes/counters/index'
-import { Route as Test2Import } from './routes/test/2'
 import { Route as GroupsNewImport } from './routes/groups/new'
 import { Route as GroupsIdImport } from './routes/groups/$id'
 import { Route as CountersNewImport } from './routes/counters/new'
-import { Route as CountersIdImport } from './routes/counters/$id'
+import { Route as CountersIdIndexImport } from './routes/counters/$id/index'
+import { Route as CountersIdEditImport } from './routes/counters/$id/edit'
 
 // Create/Update Routes
 
@@ -68,12 +68,6 @@ const CountersIndexRoute = CountersIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const Test2Route = Test2Import.update({
-  id: '/test/2',
-  path: '/test/2',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const GroupsNewRoute = GroupsNewImport.update({
   id: '/groups/new',
   path: '/groups/new',
@@ -92,9 +86,15 @@ const CountersNewRoute = CountersNewImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const CountersIdRoute = CountersIdImport.update({
-  id: '/counters/$id',
-  path: '/counters/$id',
+const CountersIdIndexRoute = CountersIdIndexImport.update({
+  id: '/counters/$id/',
+  path: '/counters/$id/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CountersIdEditRoute = CountersIdEditImport.update({
+  id: '/counters/$id/edit',
+  path: '/counters/$id/edit',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -130,13 +130,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsImport
       parentRoute: typeof rootRoute
     }
-    '/counters/$id': {
-      id: '/counters/$id'
-      path: '/counters/$id'
-      fullPath: '/counters/$id'
-      preLoaderRoute: typeof CountersIdImport
-      parentRoute: typeof rootRoute
-    }
     '/counters/new': {
       id: '/counters/new'
       path: '/counters/new'
@@ -156,13 +149,6 @@ declare module '@tanstack/react-router' {
       path: '/groups/new'
       fullPath: '/groups/new'
       preLoaderRoute: typeof GroupsNewImport
-      parentRoute: typeof rootRoute
-    }
-    '/test/2': {
-      id: '/test/2'
-      path: '/test/2'
-      fullPath: '/test/2'
-      preLoaderRoute: typeof Test2Import
       parentRoute: typeof rootRoute
     }
     '/counters/': {
@@ -186,6 +172,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestIndexImport
       parentRoute: typeof rootRoute
     }
+    '/counters/$id/edit': {
+      id: '/counters/$id/edit'
+      path: '/counters/$id/edit'
+      fullPath: '/counters/$id/edit'
+      preLoaderRoute: typeof CountersIdEditImport
+      parentRoute: typeof rootRoute
+    }
+    '/counters/$id/': {
+      id: '/counters/$id/'
+      path: '/counters/$id'
+      fullPath: '/counters/$id'
+      preLoaderRoute: typeof CountersIdIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -196,14 +196,14 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/settings': typeof SettingsRoute
-  '/counters/$id': typeof CountersIdRoute
   '/counters/new': typeof CountersNewRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
-  '/test/2': typeof Test2Route
   '/counters': typeof CountersIndexRoute
   '/groups': typeof GroupsIndexRoute
   '/test': typeof TestIndexRoute
+  '/counters/$id/edit': typeof CountersIdEditRoute
+  '/counters/$id': typeof CountersIdIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -211,14 +211,14 @@ export interface FileRoutesByTo {
   '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/settings': typeof SettingsRoute
-  '/counters/$id': typeof CountersIdRoute
   '/counters/new': typeof CountersNewRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
-  '/test/2': typeof Test2Route
   '/counters': typeof CountersIndexRoute
   '/groups': typeof GroupsIndexRoute
   '/test': typeof TestIndexRoute
+  '/counters/$id/edit': typeof CountersIdEditRoute
+  '/counters/$id': typeof CountersIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -227,14 +227,14 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/about': typeof AboutRoute
   '/settings': typeof SettingsRoute
-  '/counters/$id': typeof CountersIdRoute
   '/counters/new': typeof CountersNewRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
-  '/test/2': typeof Test2Route
   '/counters/': typeof CountersIndexRoute
   '/groups/': typeof GroupsIndexRoute
   '/test/': typeof TestIndexRoute
+  '/counters/$id/edit': typeof CountersIdEditRoute
+  '/counters/$id/': typeof CountersIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -244,42 +244,42 @@ export interface FileRouteTypes {
     | '/404'
     | '/about'
     | '/settings'
-    | '/counters/$id'
     | '/counters/new'
     | '/groups/$id'
     | '/groups/new'
-    | '/test/2'
     | '/counters'
     | '/groups'
     | '/test'
+    | '/counters/$id/edit'
+    | '/counters/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/404'
     | '/about'
     | '/settings'
-    | '/counters/$id'
     | '/counters/new'
     | '/groups/$id'
     | '/groups/new'
-    | '/test/2'
     | '/counters'
     | '/groups'
     | '/test'
+    | '/counters/$id/edit'
+    | '/counters/$id'
   id:
     | '__root__'
     | '/'
     | '/404'
     | '/about'
     | '/settings'
-    | '/counters/$id'
     | '/counters/new'
     | '/groups/$id'
     | '/groups/new'
-    | '/test/2'
     | '/counters/'
     | '/groups/'
     | '/test/'
+    | '/counters/$id/edit'
+    | '/counters/$id/'
   fileRoutesById: FileRoutesById
 }
 
@@ -288,14 +288,14 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   AboutRoute: typeof AboutRoute
   SettingsRoute: typeof SettingsRoute
-  CountersIdRoute: typeof CountersIdRoute
   CountersNewRoute: typeof CountersNewRoute
   GroupsIdRoute: typeof GroupsIdRoute
   GroupsNewRoute: typeof GroupsNewRoute
-  Test2Route: typeof Test2Route
   CountersIndexRoute: typeof CountersIndexRoute
   GroupsIndexRoute: typeof GroupsIndexRoute
   TestIndexRoute: typeof TestIndexRoute
+  CountersIdEditRoute: typeof CountersIdEditRoute
+  CountersIdIndexRoute: typeof CountersIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -303,14 +303,14 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   AboutRoute: AboutRoute,
   SettingsRoute: SettingsRoute,
-  CountersIdRoute: CountersIdRoute,
   CountersNewRoute: CountersNewRoute,
   GroupsIdRoute: GroupsIdRoute,
   GroupsNewRoute: GroupsNewRoute,
-  Test2Route: Test2Route,
   CountersIndexRoute: CountersIndexRoute,
   GroupsIndexRoute: GroupsIndexRoute,
   TestIndexRoute: TestIndexRoute,
+  CountersIdEditRoute: CountersIdEditRoute,
+  CountersIdIndexRoute: CountersIdIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -327,14 +327,14 @@ export const routeTree = rootRoute
         "/404",
         "/about",
         "/settings",
-        "/counters/$id",
         "/counters/new",
         "/groups/$id",
         "/groups/new",
-        "/test/2",
         "/counters/",
         "/groups/",
-        "/test/"
+        "/test/",
+        "/counters/$id/edit",
+        "/counters/$id/"
       ]
     },
     "/": {
@@ -349,9 +349,6 @@ export const routeTree = rootRoute
     "/settings": {
       "filePath": "settings.tsx"
     },
-    "/counters/$id": {
-      "filePath": "counters/$id.tsx"
-    },
     "/counters/new": {
       "filePath": "counters/new.tsx"
     },
@@ -361,9 +358,6 @@ export const routeTree = rootRoute
     "/groups/new": {
       "filePath": "groups/new.tsx"
     },
-    "/test/2": {
-      "filePath": "test/2.tsx"
-    },
     "/counters/": {
       "filePath": "counters/index.tsx"
     },
@@ -372,6 +366,12 @@ export const routeTree = rootRoute
     },
     "/test/": {
       "filePath": "test/index.tsx"
+    },
+    "/counters/$id/edit": {
+      "filePath": "counters/$id/edit.tsx"
+    },
+    "/counters/$id/": {
+      "filePath": "counters/$id/index.tsx"
     }
   }
 }

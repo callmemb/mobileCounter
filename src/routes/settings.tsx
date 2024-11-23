@@ -1,8 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../components/pageTemplate/component";
-import ShortcutButton from "../components/pageTemplate/components/shortcuts/shortcutButton";
-import { ArrowLeft } from "@mui/icons-material";
-import { Typography } from "@mui/material";
+import {
+  dayLabelFromOptions,
+  Settings,
+  settingsValidator,
+} from "../definitions";
+import { store, useSettings } from "../store";
+import FormPageTemplate from "../components/form/formPageTemplate";
+import TextInput from "../components/form/textInput";
+import { Controller } from "react-hook-form";
+import SelectInput from "../components/form/selectInput";
 
 export const Route = createFileRoute("/settings")({
   component: RouteComponent,
@@ -11,29 +17,50 @@ export const Route = createFileRoute("/settings")({
 function RouteComponent() {
   const navigate = useNavigate();
 
+  const settings = useSettings();
+  const onSubmit = async (data: Settings) => {
+    const { errorMessage } = await store.upsertSettings(data);
+    if (errorMessage) {
+      alert(errorMessage);
+    }
+    navigate({ to: ".." });
+  };
+
   return (
-    <PageTemplate
+    <FormPageTemplate<Settings>
       label="Settings"
-      leftOptions={[
-        <ShortcutButton
-          key="back"
-          id="back"
-          icon={<ArrowLeft />}
-          color="warning"
-          onClick={() => {
-            navigate({ to: ".." });
-          }}
-        >
-          Back
-        </ShortcutButton>,
-      ]}
+      validator={settingsValidator}
+      onSubmit={onSubmit}
+      defaultValues={settings}
     >
-      <h3>TODO</h3>
-      <ul>
-        <li> Cron timer Settings</li>
-        <li> Reset DB button</li>
-        <li> Presentation mode, populate db with random data</li>
-      </ul>
-    </PageTemplate>
+      {(register, errors, control) => (
+        <>
+          <TextInput
+            label="Daily steps goal reset time"
+            placeholder="HH:MM:SS"
+            {...register("dailyStepsResetTime")}
+            errorMessage={errors?.dailyStepsResetTime?.message?.toString()}
+          />
+          <Controller
+            control={control}
+            name="dayLabelFrom"
+            render={({ field }) => (
+              <SelectInput
+                label="Day label from"
+                options={dayLabelFromOptions.map((value) => ({
+                  value,
+                  label: value
+                    .replace(/([A-Z])/g, " $1")
+                    .toLowerCase()
+                    .replace(/^./, (str) => str.toUpperCase()),
+                }))}
+                {...field}
+                errorMessage={errors?.dayLabelFrom?.message?.toString()}
+              />
+            )}
+          />
+        </>
+      )}
+    </FormPageTemplate>
   );
 }

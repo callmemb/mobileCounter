@@ -3,11 +3,12 @@ import TextField from "@mui/material/TextField";
 
 interface Props extends React.ComponentProps<typeof TextField> {
   label: string;
+  placeholder?: string;
   errorMessage?: string;
 }
 
 const TextInput = React.forwardRef<HTMLDivElement, Props>(
-  ({ label, errorMessage, ...props }, ref) => {
+  ({ label, errorMessage, placeholder, ...props }, ref) => {
     return (
       <TextField
         ref={ref}
@@ -17,6 +18,7 @@ const TextInput = React.forwardRef<HTMLDivElement, Props>(
         variant="outlined"
         fullWidth
         sx={{ my: 1 }}
+        placeholder={placeholder}
         InputLabelProps={{
           shrink: true,
         }}
