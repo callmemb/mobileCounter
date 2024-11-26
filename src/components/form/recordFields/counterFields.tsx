@@ -1,0 +1,95 @@
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormRegister,
+} from "react-hook-form";
+import { NewCounter, SelectOption } from "../../../definitions";
+import TextInput from "../textInput";
+import IconPicker from "../iconPicker";
+import SelectInput from "../selectInput";
+import NumberInput from "../numberInput";
+import { Box } from "@mui/material";
+
+interface CounterFieldsProps {
+  register: UseFormRegister<NewCounter>;
+  errors: FieldErrors<NewCounter>;
+  control: Control<NewCounter>;
+  groupOptions: SelectOption[];
+}
+
+export default function CounterFields({
+  register,
+  errors,
+  control,
+  groupOptions,
+}: CounterFieldsProps) {
+  return (
+    <>
+      <TextInput
+        label="Label"
+        {...register("label")}
+        errorMessage={errors?.label?.message?.toString()}
+      />
+
+      <Controller
+        control={control}
+        name="icon"
+        render={({ field }) => (
+          <IconPicker
+            label="Icon"
+            {...field}
+            errorMessage={errors?.icon?.message?.toString()}
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="groupId"
+        render={({ field }) => (
+          <SelectInput
+            label="Group"
+            options={groupOptions}
+            {...field}
+            errorMessage={errors?.groupId?.message?.toString()}
+          />
+        )}
+      />
+
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <NumberInput
+          label="Default steps"
+          {...register("defaultNumberOfSteps")}
+          errorMessage={errors?.defaultNumberOfSteps?.message?.toString()}
+        />
+
+        <NumberInput
+          label="Maximum steps"
+          {...register("maxNumberOfSteps")}
+          errorMessage={errors?.maxNumberOfSteps?.message?.toString()}
+        />
+      </Box>
+
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <NumberInput
+          label="Units in step"
+          {...register("unitsInStep")}
+          errorMessage={errors?.unitsInStep?.message?.toString()}
+        />
+
+        <TextInput
+          label="Units name"
+          {...register("unitsName")}
+          errorMessage={errors?.unitsName?.message?.toString()}
+        />
+      </Box>
+
+      <NumberInput
+        label="Daily goal of steps"
+        {...register("dailyGoalOfSteps")}
+        errorMessage={errors?.dailyGoalOfSteps?.message?.toString()}
+      />
+    </>
+  );
+}

@@ -1,13 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import PageTemplate from "../../components/pageTemplate/component";
 import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
-import {
-  AddCircle,
-  ArrowLeft,
-  Delete,
-  Edit,
-  Info,
-} from "@mui/icons-material";
+import { AddCircle, ArrowLeft, Delete, Edit, Info } from "@mui/icons-material";
 import { store, useCounterGroups, useCounters } from "../../store";
 import { SortableList } from "../../components/sortableList/component";
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
@@ -57,7 +51,7 @@ function RouteComponent() {
           id={c.id}
           icon={<DynamicIcon icon={c.icon} />}
           onClick={() => {
-            document.getElementById(c.id)?.scrollIntoView({block: "center"});
+            document.getElementById(c.id)?.scrollIntoView({ block: "center" });
           }}
         >
           {c.label}
@@ -86,7 +80,8 @@ function RouteComponent() {
         renderItem={(counter) => (
           <SortableList.Item key={counter.id} id={counter.id}>
             <Box sx={{ width: "100%" }}>
-              <Box sx={{ display: "flex" }}>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <DynamicIcon icon={counter.icon} color="primary" />
                 <Typography
                   variant="subtitle1"
                   sx={{

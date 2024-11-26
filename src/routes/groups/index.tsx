@@ -72,7 +72,8 @@ function RouteComponent() {
         renderItem={(group) => (
           <SortableList.Item key={group.id} id={group.id}>
             <Box sx={{ width: "100%" }}>
-              <Box sx={{ display: "flex" }}>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <DynamicIcon icon={group.icon} color="primary" />
                 <Typography
                   variant="subtitle1"
                   sx={{

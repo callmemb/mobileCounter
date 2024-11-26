@@ -1,10 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { store } from "../../store";
 import { NewCounterGroup, newCounterGroupValidator } from "../../definitions";
-import TextInput from "../../components/form/textInput";
 import FormPageTemplate from "../../components/form/formPageTemplate";
-import IconPicker from "../../components/form/iconPicker";
-import { Controller } from "react-hook-form";
+import CounterGroupFields from "../../components/form/recordFields/counterGroupFields";
 
 export const Route = createFileRoute("/groups/new")({
   component: RouteComponent,
@@ -28,24 +26,11 @@ function RouteComponent() {
       onSubmit={onSubmit}
     >
       {(register, errors, control) => (
-        <>
-          <TextInput
-            label="Label"
-            {...register("label")}
-            errorMessage={errors?.label?.message?.toString()}
-          />
-          <Controller
-            control={control}
-            name="icon"
-            render={({ field }) => (
-              <IconPicker
-                label="Icon"
-                {...field}
-                errorMessage={errors?.icon?.message?.toString()}
-              />
-            )}
-          />
-        </>
+        <CounterGroupFields
+          register={register}
+          errors={errors}
+          control={control}
+        />
       )}
     </FormPageTemplate>
   );
