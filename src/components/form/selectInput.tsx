@@ -27,9 +27,11 @@ const SelectInput = React.forwardRef<HTMLDivElement, Props>(
         }}
         {...props}
       >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
+        {value ? null : (
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+        )}
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}

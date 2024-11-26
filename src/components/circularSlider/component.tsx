@@ -151,7 +151,7 @@ export default function CircularSlider({
         />
       );
     });
-  }, [tools, theme.palette.grey, theme.palette.info.main]);
+  }, [tools, theme.palette.grey]);
 
   const [isDragging, setIsDragging] = useState(false);
 

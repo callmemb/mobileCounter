@@ -44,6 +44,7 @@ function RouteComponent() {
         <ShortcutButton
           key="addCounter"
           id={"addCounter"}
+          color="info"
           icon={<AddCircle />}
           onClick={() => navigate({ to: "/counters/new" })}
         >
