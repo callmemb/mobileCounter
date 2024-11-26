@@ -1,13 +1,13 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 
-interface Props extends React.ComponentProps<typeof TextField> {
+export interface TextInputProps extends React.ComponentProps<typeof TextField> {
   label: string;
   placeholder?: string;
   errorMessage?: string;
 }
 
-const TextInput = React.forwardRef<HTMLDivElement, Props>(
+const TextInput = React.forwardRef<HTMLDivElement, TextInputProps>(
   ({ label, errorMessage, placeholder, ...props }, ref) => {
     return (
       <TextField

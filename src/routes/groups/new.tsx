@@ -3,6 +3,8 @@ import { store } from "../../store";
 import { NewCounterGroup, newCounterGroupValidator } from "../../definitions";
 import TextInput from "../../components/form/textInput";
 import FormPageTemplate from "../../components/form/formPageTemplate";
+import IconPicker from "../../components/form/iconPicker";
+import { Controller } from "react-hook-form";
 
 export const Route = createFileRoute("/groups/new")({
   component: RouteComponent,
@@ -25,12 +27,25 @@ function RouteComponent() {
       validator={newCounterGroupValidator}
       onSubmit={onSubmit}
     >
-      {(register, errors) => (
-        <TextInput
-          label="Label"
-          {...register("label")}
-          errorMessage={errors?.label?.message?.toString()}
-        />
+      {(register, errors, control) => (
+        <>
+          <TextInput
+            label="Label"
+            {...register("label")}
+            errorMessage={errors?.label?.message?.toString()}
+          />
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field }) => (
+              <IconPicker
+                label="Icon"
+                {...field}
+                errorMessage={errors?.icon?.message?.toString()}
+              />
+            )}
+          />
+        </>
       )}
     </FormPageTemplate>
   );

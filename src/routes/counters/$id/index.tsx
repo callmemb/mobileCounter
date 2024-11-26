@@ -33,7 +33,7 @@ function RouteComponent() {
           Back
         </ShortcutButton>,
       ]}
-      staticOptions={[
+      menuOptions={[
         [
           <ShortcutButton
             key="edit"

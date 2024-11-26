@@ -13,7 +13,16 @@ function RouteComponent() {
   return (
     <PageTemplate
       label={'Test page'}
-      staticOptions={[
+      menuOptions={[
+        <ShortcutButton
+          key="test2"
+          id={'test2'}
+          icon={'T'}
+          color="info"
+          onClick={() => navigate({ to: '/test/2' })}
+        >
+          short
+        </ShortcutButton>,
         <ShortcutButton
           key="s1"
           id={'9'}

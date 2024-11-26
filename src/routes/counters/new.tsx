@@ -7,6 +7,7 @@ import TextInput from "../../components/form/textInput";
 import NumberInput from "../../components/form/numberInput";
 import SelectInput from "../../components/form/selectInput";
 import FormPageTemplate from "../../components/form/formPageTemplate";
+import IconPicker from "../../components/form/iconPicker";
 
 export const Route = createFileRoute("/counters/new")({
   component: RouteComponent,
@@ -41,6 +42,18 @@ function RouteComponent() {
             label="Label"
             {...register("label")}
             errorMessage={errors?.label?.message?.toString()}
+          />
+
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field }) => (
+              <IconPicker
+                label="Icon"
+                {...field}
+                errorMessage={errors?.icon?.message?.toString()}
+              />
+            )}
           />
 
           <Controller

@@ -1,5 +1,13 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button, Fab, Tooltip, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Fab,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useCallback, useMemo, useRef, useState } from "react";
 import ArmHoldingTrigger from "./armHoldingTrigger";
 import ProgressBar from "./progressBar";
@@ -21,13 +29,14 @@ type CircularSliderProps = {
   minStep: number;
   maxStep: number;
   stepSize: number;
-  unitName: string;
+  unitName?: string;
   label: string;
   id: string;
   tools: {
     id: string;
     icon: React.ReactNode;
     label: string;
+    color?: ButtonProps["color"];
     action: () => void;
   }[];
 };
@@ -116,7 +125,7 @@ export default function CircularSlider({
 
   const toolsWithRotation = useMemo(() => {
     const gap = 90 / (tools.length + 1);
-    return tools.map(({ id, label, icon, action }, i) => {
+    return tools.map(({ id, label, icon, color = "secondary", action }, i) => {
       return (
         <ArmHoldingTrigger
           key={id}
@@ -125,16 +134,13 @@ export default function CircularSlider({
             <Tooltip title={label}>
               <Button
                 variant="outlined"
-                color="info"
                 size="small"
+                color={color}
                 sx={{
                   padding: 0.8,
                   minWidth: 0,
                   borderColor: theme.palette.grey[300],
                   borderRadius: "50%",
-                  "&:hover": {
-                    borderColor: theme.palette.info.main,
-                  },
                 }}
                 onClick={action}
               >
@@ -248,7 +254,7 @@ export default function CircularSlider({
         onRadius={100}
         size={2}
         ranges={[
-          { color: theme.palette.primary.main, value: "var(--value-deg)" },
+          { color: theme.palette.secondary.main, value: "var(--value-deg)" },
         ]}
         sx={{
           transition: `--value-deg ${isDragging ? "0s" : "0.5s"}`,
@@ -260,9 +266,9 @@ export default function CircularSlider({
         onRadius={97}
         size={4}
         ranges={[
-          { color: theme.palette.info.main, value: `var(--value2-deg)` },
+          { color: theme.palette.primary.main, value: `var(--value2-deg)` },
           {
-            color: theme.palette.primary.main,
+            color: theme.palette.secondary.main,
             value: `calc( min(var(--value2-deg) + var(--value-deg) , ${MAX_DEG}deg) )`,
           },
         ]}
@@ -323,7 +329,10 @@ export default function CircularSlider({
 
       <Box // input
         onFocus={() => {
-          containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          containerRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
         }}
         sx={{
           opacity: 0,
@@ -382,6 +391,7 @@ export default function CircularSlider({
                   }
                 : { transform: "scale(1)", cursor: "grabbing" }),
               transition: "transform 0.5s, background 0.5s",
+              border: `1px solid ${theme.palette.secondary.main}`,
             }}
           >
             <Add />

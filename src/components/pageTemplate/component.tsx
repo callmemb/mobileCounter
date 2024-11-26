@@ -1,13 +1,14 @@
 import React from "react";
 import ShortcutPanel from "./components/shortcuts/shortcutPanel";
 import { Box, Paper, Typography } from "@mui/material";
+import ShortcutMenuButton from "./components/shortcuts/shortcutMenuButton";
 
 type PageTemplateProps = {
   children: React.ReactNode | React.ReactNode[] | undefined;
   label?: string;
   leftOptions?: React.ReactNode | React.ReactNode[];
   rightOptions?: React.ReactNode | React.ReactNode[];
-  staticOptions?: React.ReactNode | React.ReactNode[];
+  menuOptions?: React.ReactNode[];
 };
 
 export const PageTemplate: React.FC<PageTemplateProps> = ({
@@ -15,7 +16,7 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
   label = null,
   leftOptions = [],
   rightOptions = [],
-  staticOptions = [],
+  menuOptions = [],
 }) => {
   const leftRef = React.useRef<HTMLDivElement>(null);
   const rightRef = React.useRef<HTMLDivElement>(null);
@@ -83,7 +84,9 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
       >
         <Box sx={{ gridColumn: "3", position: "relative", zIndex: 3 }}>
           <ShortcutPanel side="right" scrollableRef={rightRef}>
-            {staticOptions}
+            {menuOptions?.length > 3 ? (
+              <ShortcutMenuButton>{menuOptions}</ShortcutMenuButton>
+            ) : menuOptions}
             {label ? (
               <Typography
                 variant="h4"
@@ -100,7 +103,7 @@ export const PageTemplate: React.FC<PageTemplateProps> = ({
                 {label}
               </Typography>
             ) : null}
-            <Box sx={{ height: '1rem' }} />
+            <Box sx={{ height: "1rem" }} />
             {rightOptions}
           </ShortcutPanel>
         </Box>

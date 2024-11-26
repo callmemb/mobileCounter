@@ -18,6 +18,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as TestIndexImport } from './routes/test/index'
 import { Route as GroupsIndexImport } from './routes/groups/index'
 import { Route as CountersIndexImport } from './routes/counters/index'
+import { Route as Test2Import } from './routes/test/2'
 import { Route as GroupsNewImport } from './routes/groups/new'
 import { Route as GroupsIdImport } from './routes/groups/$id'
 import { Route as CountersNewImport } from './routes/counters/new'
@@ -65,6 +66,12 @@ const GroupsIndexRoute = GroupsIndexImport.update({
 const CountersIndexRoute = CountersIndexImport.update({
   id: '/counters/',
   path: '/counters/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const Test2Route = Test2Import.update({
+  id: '/test/2',
+  path: '/test/2',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -151,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsNewImport
       parentRoute: typeof rootRoute
     }
+    '/test/2': {
+      id: '/test/2'
+      path: '/test/2'
+      fullPath: '/test/2'
+      preLoaderRoute: typeof Test2Import
+      parentRoute: typeof rootRoute
+    }
     '/counters/': {
       id: '/counters/'
       path: '/counters'
@@ -199,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/counters/new': typeof CountersNewRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
+  '/test/2': typeof Test2Route
   '/counters': typeof CountersIndexRoute
   '/groups': typeof GroupsIndexRoute
   '/test': typeof TestIndexRoute
@@ -214,6 +229,7 @@ export interface FileRoutesByTo {
   '/counters/new': typeof CountersNewRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
+  '/test/2': typeof Test2Route
   '/counters': typeof CountersIndexRoute
   '/groups': typeof GroupsIndexRoute
   '/test': typeof TestIndexRoute
@@ -230,6 +246,7 @@ export interface FileRoutesById {
   '/counters/new': typeof CountersNewRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
+  '/test/2': typeof Test2Route
   '/counters/': typeof CountersIndexRoute
   '/groups/': typeof GroupsIndexRoute
   '/test/': typeof TestIndexRoute
@@ -247,6 +264,7 @@ export interface FileRouteTypes {
     | '/counters/new'
     | '/groups/$id'
     | '/groups/new'
+    | '/test/2'
     | '/counters'
     | '/groups'
     | '/test'
@@ -261,6 +279,7 @@ export interface FileRouteTypes {
     | '/counters/new'
     | '/groups/$id'
     | '/groups/new'
+    | '/test/2'
     | '/counters'
     | '/groups'
     | '/test'
@@ -275,6 +294,7 @@ export interface FileRouteTypes {
     | '/counters/new'
     | '/groups/$id'
     | '/groups/new'
+    | '/test/2'
     | '/counters/'
     | '/groups/'
     | '/test/'
@@ -291,6 +311,7 @@ export interface RootRouteChildren {
   CountersNewRoute: typeof CountersNewRoute
   GroupsIdRoute: typeof GroupsIdRoute
   GroupsNewRoute: typeof GroupsNewRoute
+  Test2Route: typeof Test2Route
   CountersIndexRoute: typeof CountersIndexRoute
   GroupsIndexRoute: typeof GroupsIndexRoute
   TestIndexRoute: typeof TestIndexRoute
@@ -306,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   CountersNewRoute: CountersNewRoute,
   GroupsIdRoute: GroupsIdRoute,
   GroupsNewRoute: GroupsNewRoute,
+  Test2Route: Test2Route,
   CountersIndexRoute: CountersIndexRoute,
   GroupsIndexRoute: GroupsIndexRoute,
   TestIndexRoute: TestIndexRoute,
@@ -330,6 +352,7 @@ export const routeTree = rootRoute
         "/counters/new",
         "/groups/$id",
         "/groups/new",
+        "/test/2",
         "/counters/",
         "/groups/",
         "/test/",
@@ -357,6 +380,9 @@ export const routeTree = rootRoute
     },
     "/groups/new": {
       "filePath": "groups/new.tsx"
+    },
+    "/test/2": {
+      "filePath": "test/2.tsx"
     },
     "/counters/": {
       "filePath": "counters/index.tsx"

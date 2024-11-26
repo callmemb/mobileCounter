@@ -54,10 +54,11 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#0a2",
+      main: "hsl(132, 100%, 33%)",
     },
     secondary: {
-      main: "#01c5dc",
+      // main: "#01c5dc",
+      main: "hsl(228, 80%, 70%)",
     },
     success: {
       main: "#008aff",

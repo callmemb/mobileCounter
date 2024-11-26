@@ -15,7 +15,7 @@ type ShortcutButton = {
 export default function ShortcutButton({
   id,
   icon,
-  color,
+  color = "primary",
   disabled,
   children,
   isSelected,
@@ -42,7 +42,7 @@ export default function ShortcutButton({
 }
 
 const SlidingButton = styled(Button)(({ theme }) => ({
-  minWidth: 35,
+  minWidth: 45,
   display: "flex",
   gap: ".3rem",
   height: "round(2.4rem, 1px)", // antyaliasing problem fixer.

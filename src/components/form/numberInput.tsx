@@ -4,13 +4,10 @@ import TextField from "@mui/material/TextField";
 interface Props extends React.ComponentProps<typeof TextField> {
   label: string;
   errorMessage?: string;
-  min?: number;
-  max?: number;
-  step?: number;
 }
 
 const NumberInput = React.forwardRef<HTMLDivElement, Props>(
-  ({ label, errorMessage, min, max, step,...props }, ref) => {
+  ({ label, errorMessage, ...props }, ref) => {
     return (
       <TextField
         ref={ref}
@@ -24,11 +21,6 @@ const NumberInput = React.forwardRef<HTMLDivElement, Props>(
         slotProps={{
           inputLabel: {
             shrink: true,
-          },
-          htmlInput: {
-            min,
-            max,
-            step,
           },
         }}
         {...props}

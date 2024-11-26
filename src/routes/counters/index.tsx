@@ -14,6 +14,7 @@ import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Counter } from "../../definitions";
 import ConfirmationDialog from "../../components/confirmDialog/component";
+import DynamicIcon from "../../components/dynamicIcon/component";
 
 export const Route = createFileRoute("/counters/")({
   component: RouteComponent,
@@ -39,7 +40,7 @@ function RouteComponent() {
   return (
     <PageTemplate
       label="Counters"
-      staticOptions={[
+      menuOptions={[
         <ShortcutButton
           key="addCounter"
           id={"addCounter"}
@@ -49,16 +50,16 @@ function RouteComponent() {
           Add new
         </ShortcutButton>,
       ]}
-      rightOptions={localCounters.map((g) => (
+      rightOptions={localCounters.map((c) => (
         <ShortcutButton
-          key={g.id}
-          id={g.id}
-          icon={g.label[0]}
+          key={c.id}
+          id={c.id}
+          icon={<DynamicIcon icon={c.icon} />}
           onClick={() => {
-            document.getElementById(g.id)?.scrollIntoView({block: "center"});
+            document.getElementById(c.id)?.scrollIntoView({block: "center"});
           }}
         >
-          {g.label}
+          {c.label}
         </ShortcutButton>
       ))}
       leftOptions={[

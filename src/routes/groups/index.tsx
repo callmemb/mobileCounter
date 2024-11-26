@@ -7,6 +7,7 @@ import { SortableList } from "../../components/sortableList/component";
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import ConfirmationDialog from "../../components/confirmDialog/component";
+import DynamicIcon from "../../components/dynamicIcon/component";
 
 export const Route = createFileRoute("/groups/")({
   component: RouteComponent,
@@ -25,7 +26,7 @@ function RouteComponent() {
   return (
     <PageTemplate
       label="Groups"
-      staticOptions={[
+      menuOptions={[
         <ShortcutButton
           key="addCounterGroup"
           id={"addCounterGroup"}
@@ -40,9 +41,9 @@ function RouteComponent() {
         <ShortcutButton
           key={g.id}
           id={g.id}
-          icon={g.label[0]}
+          icon={<DynamicIcon icon={g.icon} />}
           onClick={() => {
-            document.getElementById(g.id)?.scrollIntoView({block: "center"});
+            document.getElementById(g.id)?.scrollIntoView({ block: "center" });
           }}
         >
           {g.label}

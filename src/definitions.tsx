@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { iconNames } from "./iconRelatedConsts";
+
+const iconValidator = z.enum([...iconNames] as [string, ...string[]]);
 
 export const newCounterValidator = z.object({
   label: z.string().min(3),
@@ -8,6 +11,7 @@ export const newCounterValidator = z.object({
   dailyGoalOfSteps: z.coerce.number().min(1),
   unitsName: z.string().optional(),
   groupId: z.string().min(1),
+  icon: iconValidator,
 });
 
 export const counterValidator = z.object({
@@ -21,6 +25,7 @@ export const counterValidator = z.object({
 
 export const newCounterGroupValidator = z.object({
   label: z.string().min(3),
+  icon: iconValidator,
 });
 
 export const counterGroupValidator = z.object({

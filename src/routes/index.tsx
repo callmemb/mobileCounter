@@ -4,7 +4,6 @@ import ShortcutButton from "../components/pageTemplate/components/shortcuts/shor
 import {
   AvTimer,
   Description,
-  Info,
   InfoOutlined,
   Settings,
   TextSnippet,
@@ -16,6 +15,7 @@ import { Stack } from "@mui/material";
 import CircularSlider from "../components/circularSlider/component";
 import { Counter, CounterAction } from "../definitions";
 import { useState } from "react";
+import DynamicIcon from "../components/dynamicIcon/component";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -32,7 +32,7 @@ function RouteComponent() {
 
   return (
     <PageTemplate
-      staticOptions={[
+      menuOptions={[
         <ShortcutButton
           color="info"
           key="counterOptions"
@@ -83,7 +83,7 @@ function RouteComponent() {
         <ShortcutButton
           key={g.id}
           id={g.id}
-          icon={g.label[0]}
+          icon={<DynamicIcon icon={g.icon} />}
           isSelected={g.id === group}
           onClick={() => {
             navigate({
@@ -100,9 +100,11 @@ function RouteComponent() {
           <ShortcutButton
             key={c.id}
             id={c.id}
-            icon={c.label[0]}
+            icon={<DynamicIcon icon={c.icon} />}
             onClick={() => {
-              document.getElementById(c.id)?.scrollIntoView({block: "center"});
+              document
+                .getElementById(c.id)
+                ?.scrollIntoView({ block: "center" });
             }}
           >
             {c.label}
@@ -110,7 +112,7 @@ function RouteComponent() {
         )),
       ]}
     >
-      <Stack gap={5} py='1rem' alignItems={"center"}>
+      <Stack gap={10} py="1rem" alignItems={"center"}>
         {counters.map((c) => (
           <CircularSliderWithActionMemory
             key={c.id}
@@ -174,7 +176,7 @@ function CircularSliderWithActionMemory({
         {
           id: "info",
           label: "More info",
-          icon: <Info color="info" />,
+          icon: <InfoOutlined />,
           action: () => navigate({ to: "/counters/$id", params: { id: c.id } }),
         },
       ]}
