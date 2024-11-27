@@ -1,5 +1,5 @@
 import React from "react";
-import { MenuItem, TextField } from "@mui/material";
+import { MenuItem, SlotProps, TextField } from "@mui/material";
 import { SelectOption } from "../../definitions";
 
 interface Props extends React.ComponentProps<typeof TextField> {
@@ -7,10 +7,11 @@ interface Props extends React.ComponentProps<typeof TextField> {
   errorMessage?: string;
   options: SelectOption[];
   value?: string;
+  multiple?: boolean;
 }
 
 const SelectInput = React.forwardRef<HTMLDivElement, Props>(
-  ({ label, errorMessage, options, value, ...props }, ref) => {
+  ({ label, errorMessage, options, value, multiple, ...props }, ref) => {
     return (
       <TextField
         ref={ref}
@@ -20,10 +21,14 @@ const SelectInput = React.forwardRef<HTMLDivElement, Props>(
         helperText={errorMessage}
         variant="outlined"
         fullWidth
-        value={value || ""}
+        value={value || []}
         sx={{ my: 1 }}
-        InputLabelProps={{
-          shrink: true,
+        slotProps={{
+          ...props.slotProps,
+          inputLabel: {
+            shrink: true,
+          },
+          select: { multiple },
         }}
         {...props}
       >

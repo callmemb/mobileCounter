@@ -19,8 +19,11 @@ const TextInput = React.forwardRef<HTMLDivElement, TextInputProps>(
         fullWidth
         sx={{ my: 1 }}
         placeholder={placeholder}
-        InputLabelProps={{
-          shrink: true,
+        slotProps={{
+          ...props.slotProps,
+          inputLabel: {
+            shrink: true,
+          },
         }}
         {...props}
       />

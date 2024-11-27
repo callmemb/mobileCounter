@@ -90,6 +90,28 @@ export default function CounterFields({
         {...register("dailyGoalOfSteps")}
         errorMessage={errors?.dailyGoalOfSteps?.message?.toString()}
       />
+
+      <Controller
+        control={control}
+        name="activeDaysOfWeek"
+        render={({ field }) => (
+          <SelectInput
+          multiple
+            label="Active days of week"
+            options={[
+              { label: "Sunday", value: 0 },
+              { label: "Monday", value: 1 },
+              { label: "Tuesday", value: 2 },
+              { label: "Wednesday", value: 3 },
+              { label: "Thursday", value: 4 },
+              { label: "Friday", value: 5 },
+              { label: "Saturday", value: 6 },
+            ]}
+            {...field}
+            errorMessage={errors?.activeDaysOfWeek?.message?.toString()}
+          />
+        )}
+      />
     </>
   );
 }

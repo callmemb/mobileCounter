@@ -16,6 +16,7 @@ import { db } from "./store/indexDB";
 import { v4 as genId } from "uuid";
 import { generateKeyBetween } from "./lib/generateKeyBetween";
 import dayjs from "dayjs";
+import { getDayOfWeek } from "./lib/dates";
 
 type StoreResponse<T> = {
   errorMessage?: string;
@@ -284,18 +285,40 @@ export function useCounter(id: Counter["id"]) {
   return useLiveQuery(() => db.counters.get(id), [id]);
 }
 
-export function useCounters(groupId: CounterGroup["id"] | null) {
+export function useCounters(
+  groupId: CounterGroup["id"] | null,
+  filterByActiveDays = false
+) {
+  const settings = useSettings();
+  const { dailyStepsResetTime, dayLabelFrom } = settings || {};
+
+  const currentDayOfWeek = getDayOfWeek(
+    new Date(),
+    dailyStepsResetTime,
+    dayLabelFrom
+  );
   return (
     useLiveQuery(
       () =>
         typeof groupId !== "string"
-          ? db.counters.orderBy("order").toArray()
+          ? db.counters
+              .orderBy("order")
+              .and(
+                ({ activeDaysOfWeek = [] }) =>
+                  !filterByActiveDays ||
+                  activeDaysOfWeek.includes(currentDayOfWeek)
+              )
+              .toArray()
           : db.counters
               .where("groupId")
               .equals(groupId || "")
-              .and((counter) => counter.order !== undefined)
+              .and(
+                ({ activeDaysOfWeek = [] }) =>
+                  !filterByActiveDays ||
+                  activeDaysOfWeek.includes(currentDayOfWeek)
+              )
               .sortBy("order"),
-      [groupId]
+      [groupId, filterByActiveDays]
     ) || []
   );
 }

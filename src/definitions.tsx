@@ -12,6 +12,7 @@ export const newCounterValidator = z.object({
   unitsName: z.string().optional(),
   groupId: z.string().min(1),
   icon: iconValidator,
+  activeDaysOfWeek: z.array(z.number().min(0).max(6)),
 });
 
 export const counterValidator = z.object({

@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
 function RouteComponent() {
   const { group } = Route.useSearch();
   const navigate = useNavigate();
-  const counters = useCounters(group || null);
+  const counters = useCounters(group || null, true);
   const groups = useCounterGroups();
 
   return (

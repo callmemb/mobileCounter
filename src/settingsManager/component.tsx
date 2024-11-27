@@ -1,26 +1,26 @@
 import { useEffect } from "react";
 import { store, useSettings } from "../store";
 import { CronJob } from "cron";
-import dayjs from "dayjs";
+import { isDaysTheSame } from "../lib/dates";
 
 export default function SettingsManager() {
   const settings = useSettings();
 
-  useEffect(() => { // reset daily steps
+  useEffect(() => {
+    // reset daily steps
     if (!settings?.dailyStepsResetTime) return;
     const { dailyStepsResetTime, lastDailyStepResetDate } = settings || {};
     const [hh, mm, ss] = dailyStepsResetTime.split(":");
-    const tmp = dayjs().set("h", +hh).set("m", +mm).set("s", +ss);
-    const dailyStepsBreakpointTime = tmp.isAfter(dayjs())
-      ? tmp.subtract(1, "d")
-      : tmp;
-    const cronTime = `${ss} ${mm} ${hh} * * *`;
     const job = new CronJob(
-      cronTime, // cronTime
+      `${ss} ${mm} ${hh} * * *`, // cronTime
       function () {
         if (
           !lastDailyStepResetDate ||
-          dailyStepsBreakpointTime.isAfter(dayjs(lastDailyStepResetDate))
+          !isDaysTheSame(
+            new Date(),
+            lastDailyStepResetDate,
+            dailyStepsResetTime
+          )
         ) {
           console.log("resetCountersStepsDaily");
           store.clearAllCurrentSteps();
