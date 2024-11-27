@@ -95,7 +95,7 @@ function RouteComponent() {
                 </Typography>
                 <SortableList.DragHandle />
               </Box>
-              <Typography variant="caption">{counter.groupName}</Typography>
+              <Typography variant="caption" px={2}>{counter.groupName}</Typography>
               <Stack direction="row" spacing={1}>
                 <ConfirmationDialog
                   title="Delete Counter"

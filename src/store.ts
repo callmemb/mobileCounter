@@ -193,6 +193,18 @@ class Store {
     }
   }
 
+  async deleteOldCounterActions() {
+    const settings = await db.settings.get("0");
+    const ttl = settings?.counterActionDaysToLive;
+    if (!ttl) {
+      return;
+    }
+    const [hh, mm, ss] = settings.dailyStepsResetTime.split(":");
+    const tmp = dayjs().set("h", +hh).set("m", +mm).set("s", +ss);
+    const dateLimit = tmp.isAfter(dayjs()) ? tmp.subtract(1, "d") : tmp;
+    await db.counterActions.where("date").below(dateLimit.toDate()).delete();
+  }
+
   async moveCounter(
     counterId: Counter["id"],
     afterCounterId?: Counter["id"],
@@ -333,7 +345,11 @@ export function useCounterGroups() {
 export function useCounterActions(counterId: Counter["id"]) {
   return (
     useLiveQuery(() =>
-      db.counterActions.where("counterId").equals(counterId).toArray()
+      db.counterActions
+        .where("counterId")
+        .equals(counterId)
+        .reverse()
+        .sortBy("date")
     ) || []
   );
 }

@@ -9,6 +9,7 @@ import FormPageTemplate from "../components/form/formPageTemplate";
 import TextInput from "../components/form/textInput";
 import { Controller } from "react-hook-form";
 import SelectInput from "../components/form/selectInput";
+import NumberInput from "../components/form/numberInput";
 
 export const Route = createFileRoute("/settings")({
   component: RouteComponent,
@@ -59,6 +60,13 @@ function RouteComponent() {
               />
             )}
           />
+
+          <NumberInput
+            label="Counter action days to live"
+            {...register("counterActionDaysToLive")}
+            errorMessage={errors?.counterActionDaysToLive?.message?.toString()}
+          />
+          
         </>
       )}
     </FormPageTemplate>
