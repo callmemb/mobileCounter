@@ -103,13 +103,7 @@ class Store {
     try {
       return await db
         .transaction("rw", db.counters, db.counterGroups, async () => {
-          const relevantCounters = await db.counters
-            .where("groupId")
-            .equals(`${id}`)
-            .toArray();
-          await Promise.all(
-            relevantCounters.map((counter) => this.deleteCounter(counter.id))
-          );
+          await db.counters.where("groupId").equals(`${id}`).delete();
           await db.counterGroups.delete(id);
         })
         .then(() => {
@@ -329,7 +323,7 @@ export function useCounters(
                   !filterByActiveDays ||
                   activeDaysOfWeek.includes(currentDayOfWeek)
               )
-              .sortBy("order"),
+              .toArray(),
       [groupId, filterByActiveDays]
     ) || []
   );
@@ -345,11 +339,7 @@ export function useCounterGroups() {
 export function useCounterActions(counterId: Counter["id"]) {
   return (
     useLiveQuery(() =>
-      db.counterActions
-        .where("counterId")
-        .equals(counterId)
-        .reverse()
-        .sortBy("date")
+      db.counterActions.where("counterId").equals(counterId).reverse().toArray()
     ) || []
   );
 }

@@ -94,7 +94,7 @@ function RouteComponent() {
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {dayjs(action.date).format("DD-MM-YYYY")}
+                    {dayjs(action.date).format("DD-MM-YYYY HH:mm")}
                   </TableCell>
                   <TableCell align="right">{action.value}</TableCell>
                   <TableCell align="right">

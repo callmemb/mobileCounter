@@ -11,10 +11,10 @@ const db = new Dexie("CountersDatabase") as Dexie & {
 };
 
 // Schema declaration:
-db.version(1).stores({
-  counters: "id, groupId, order",
+db.version(2).stores({
+  counters: "id, [groupId+order], order ",
   counterGroups: "id, order",
-  counterActions: "id, date, counterId",
+  counterActions: "id, [counterId+date]",
   settings: "id",
 });
 
