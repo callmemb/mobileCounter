@@ -16,7 +16,7 @@ import { db } from "./store/indexDB";
 import { v4 as genId } from "uuid";
 import { generateKeyBetween } from "./lib/generateKeyBetween";
 import dayjs from "dayjs";
-import { getDayOfWeek } from "./lib/dates";
+import { getDayOfWeek, isDaysTheSame } from "./lib/dates";
 
 type StoreResponse<T> = {
   errorMessage?: string;
@@ -158,13 +158,13 @@ class Store {
       return await db
         .transaction("rw", db.counters, db.counterActions, async () => {
           if (settings?.dailyStepsResetTime) {
-            // check if action is in the same day.
-            const [hh, mm, ss] = settings.dailyStepsResetTime.split(":");
-            const tmp = dayjs().set("h", +hh).set("m", +mm).set("s", +ss);
-            const dailyStepsBreakpointTime = tmp.isAfter(dayjs())
-              ? tmp.subtract(1, "d")
-              : tmp;
-            if (dailyStepsBreakpointTime.isBefore(counterAction.date)) {
+            if (
+              isDaysTheSame(
+                new Date(),
+                counterAction.date,
+                settings.dailyStepsResetTime
+              )
+            ) {
               const newCurrentSteps =
                 counter.currentSteps -
                 counterAction.value / counter.unitsInStep;

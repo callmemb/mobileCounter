@@ -14,7 +14,7 @@ const db = new Dexie("CountersDatabase") as Dexie & {
 db.version(2).stores({
   counters: "id, [groupId+order], order ",
   counterGroups: "id, order",
-  counterActions: "id, [counterId+date]",
+  counterActions: "id, date, [counterId+date]",
   settings: "id",
 });
 
