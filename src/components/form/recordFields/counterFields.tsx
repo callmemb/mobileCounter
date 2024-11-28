@@ -2,6 +2,7 @@ import {
   Control,
   Controller,
   FieldErrors,
+  useFormContext,
   UseFormRegister,
 } from "react-hook-form";
 import { NewCounter, SelectOption } from "../../../definitions";
@@ -10,6 +11,7 @@ import IconPicker from "../iconPicker";
 import SelectInput from "../selectInput";
 import NumberInput from "../numberInput";
 import { Box } from "@mui/material";
+import { useEffect } from "react";
 
 interface CounterFieldsProps {
   register: UseFormRegister<NewCounter>;
@@ -24,6 +26,29 @@ export default function CounterFields({
   control,
   groupOptions,
 }: CounterFieldsProps) {
+  const {
+    trigger,
+    formState: { isValid, touchedFields },
+  } = useFormContext();
+
+  /** rhf cant handle refined part in validation,
+   * this is a workaround to trigger validation
+   */
+  useEffect(() => {
+    if (
+      touchedFields.maxNumberOfSteps &&
+      touchedFields.defaultNumberOfSteps &&
+      !isValid
+    ) {
+      trigger("maxNumberOfSteps");
+    }
+  }, [
+    touchedFields.maxNumberOfSteps,
+    touchedFields.defaultNumberOfSteps,
+    isValid,
+    trigger,
+  ]);
+
   return (
     <>
       <TextInput

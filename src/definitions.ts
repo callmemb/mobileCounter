@@ -15,9 +15,9 @@ export const newCounterValidator = z
     icon: iconValidator,
     activeDaysOfWeek: z.array(z.number().min(0).max(6)),
   })
-  .refine((data) => data.defaultNumberOfSteps < data.maxNumberOfSteps, {
-    message: "default number should be smaller than max number of steps",
-    path: ["defaultNumberOfSteps"],
+  .refine((data) => +data.defaultNumberOfSteps <= +data.maxNumberOfSteps, {
+    message: "max can not be less than default",
+    path: ["maxNumberOfSteps"],
   });
 
 export const counterValidator = z
@@ -52,6 +52,22 @@ export const counterActionValidator = z
     date: z.date(),
   })
   .and(newCounterActionValidator);
+
+export const counterActionDayAggregatedValidator = z.object({
+  counterId: z.string(),
+  value: z.coerce.number().min(1),
+  day: z
+    .string()
+    .regex(
+      /^\d{2}-\d{2}-\d{4}$/,
+      "Invalid date format, should be 'DD-MM-YYYY'"
+    ),
+});
+export const counterActionMonthAggregatedValidator = z.object({
+  counterId: z.string(),
+  value: z.coerce.number().min(1),
+  month: z.string().date(),
+});
 
 export const dayLabelFromOptions = ["startOfRange", "endOfRange"] as const;
 
