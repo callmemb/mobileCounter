@@ -96,7 +96,7 @@ export default function CounterFields({
         name="activeDaysOfWeek"
         render={({ field }) => (
           <SelectInput
-          multiple
+            multiple
             label="Active days of week"
             options={[
               { label: "Sunday", value: 0 },

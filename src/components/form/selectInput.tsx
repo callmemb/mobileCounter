@@ -1,12 +1,12 @@
 import React from "react";
-import { MenuItem, SlotProps, TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
 import { SelectOption } from "../../definitions";
 
 interface Props extends React.ComponentProps<typeof TextField> {
   label: string;
   errorMessage?: string;
   options: SelectOption[];
-  value?: string;
+  value?: string | number | (string | number)[];
   multiple?: boolean;
 }
 
@@ -33,7 +33,7 @@ const SelectInput = React.forwardRef<HTMLDivElement, Props>(
         {...props}
       >
         {value ? null : (
-          <MenuItem value="">
+          <MenuItem value="" disabled>
             <em>None</em>
           </MenuItem>
         )}
