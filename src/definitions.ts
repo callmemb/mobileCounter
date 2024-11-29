@@ -74,7 +74,8 @@ export const dayLabelFromOptions = ["startOfRange", "endOfRange"] as const;
 export const settingsValidator = z.object({
   id: z.string().optional(),
   dailyStepsResetTime: z.string().time({ precision: 0 }),
-  dayLabelFrom: z.enum(dayLabelFromOptions),
+  // dayLabelFrom: z.enum(dayLabelFromOptions),
+  dayLabelFrom: z.string(),
   counterActionDaysToLive: z.coerce.number().min(1),
 
   // system

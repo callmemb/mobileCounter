@@ -1,8 +1,6 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { TextField } from "@mui/material";
+import NumberInput from "../form/components/numberInput";
 
 type CounterValueInputProps = {
   label: string;
@@ -29,35 +27,36 @@ export default function CounterValueInput({
   defaultStep,
   onChange,
 }: CounterValueInputProps) {
-  const {
-    reset,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<{ value: number }>({
-    resolver: zodResolver(
-      z.object({
-        value: z.coerce
-          .number()
-          .min(minStep * stepSize)
-          .max(maxStep * stepSize)
-          .multipleOf(stepSize),
-      })
-    ),
-    mode: "onChange",
-    defaultValues: { value: defaultStep * stepSize },
-  });
+  const [value, setValue] = useState<number | undefined>(
+    defaultStep * stepSize
+  );
 
-  const resetToDefault = () => {
-    reset({ value: defaultStep * stepSize });
-  };
+  const validator = useMemo(
+    () =>
+      z.coerce
+        .number()
+        .min(minStep * stepSize)
+        .max(maxStep * stepSize)
+        .multipleOf(stepSize),
+    [minStep, maxStep, stepSize]
+  );
+
+  const errors = useMemo(() => {
+    const { error } = validator.safeParse(value);
+    return error ? error?.errors.map((e) => e.message).join(", ") : undefined;
+  }, [value, validator]);
+
+  const resetToDefault = useCallback(() => {
+    setValue(defaultStep * stepSize);
+  }, [defaultStep, stepSize]);
 
   useEffect(() => {
     resetToDefault();
-  }, [defaultStep, stepSize, reset]);
+  }, [resetToDefault]);
 
-  const onSubmit = (data: { value: number }) => {
-    onChange(data.value);
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onChange(value || 0);
     findNextFocusableElement(
       // Element is only visible if input is focused
       // so we are sure there is active element
@@ -66,16 +65,16 @@ export default function CounterValueInput({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} onBlur={resetToDefault}>
-      <TextField
+    <form action="" onSubmit={onSubmit}>
+      <NumberInput
         type="number"
+        popupErrors
         label={label}
-        error={!!errors.value}
-        {...register("value")}
+        errorMessage={errors}
+        value={value}
+        onChange={(v) => setValue(v)}
+        onBlur={resetToDefault}
         slotProps={{
-          inputLabel: {
-            shrink: true,
-          },
           htmlInput: {
             min: minStep * stepSize,
             max: maxStep * stepSize,

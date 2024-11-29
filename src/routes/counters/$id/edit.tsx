@@ -2,9 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { useMemo } from "react";
 import { store, useCounter, useCounterGroups } from "../../../store";
-import { counterValidator, NewCounter } from "../../../definitions";
-import FormPageTemplate from "../../../components/form/formPageTemplate";
-import CounterFields from "../../../components/form/recordFields/counterFields";
+import { NewCounter } from "../../../definitions";
+import CounterForm from "../../../components/form/counter";
 
 export const Route = createFileRoute("/counters/$id/edit")({
   component: RouteComponent,
@@ -17,8 +16,11 @@ function RouteComponent() {
   const groups = useCounterGroups();
   const navigate = useNavigate();
 
-  const onSubmit = async (data: NewCounter) => {
-    const { errorMessage } = await store.upsertCounter({ ...counter, ...data });
+  const onSubmit = async ({ value }: { value: NewCounter }) => {
+    const { errorMessage } = await store.upsertCounter({
+      ...counter,
+      ...value,
+    });
     if (errorMessage) {
       alert(errorMessage);
       return;
@@ -32,22 +34,11 @@ function RouteComponent() {
   );
 
   return (
-    <FormPageTemplate<NewCounter>
+    <CounterForm
+      counter={counter}
+      groupOptions={groupOptions}
       label="Edit Counter"
-      validator={counterValidator}
       onSubmit={onSubmit}
-      defaultValues={counter}
-    >
-      {(register, errors, control) => (
-        <>
-          <CounterFields
-            register={register}
-            errors={errors}
-            control={control}
-            groupOptions={groupOptions}
-          />
-        </>
-      )}
-    </FormPageTemplate>
+    />
   );
 }

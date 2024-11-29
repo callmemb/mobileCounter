@@ -1,8 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { store, useCounterGroup } from "../../store";
-import { counterGroupValidator, NewCounterGroup } from "../../definitions";
-import FormPageTemplate from "../../components/form/formPageTemplate";
-import CounterGroupFields from "../../components/form/recordFields/counterGroupFields";
+import { NewCounterGroup } from "../../definitions";
+import CounterGroupForm from "../../components/form/counterGroup";
 
 export const Route = createFileRoute("/groups/$id")({
   component: RouteComponent,
@@ -14,10 +13,10 @@ function RouteComponent() {
   const group = useCounterGroup(id);
   const navigate = useNavigate();
 
-  const onSubmit = async (data: NewCounterGroup) => {
+  const onSubmit = async ({ value }: { value: NewCounterGroup }) => {
     const { errorMessage } = await store.upsertCounterGroup({
       ...group,
-      ...data,
+      ...value,
     });
     if (errorMessage) {
       alert(errorMessage);
@@ -27,19 +26,10 @@ function RouteComponent() {
   };
 
   return (
-    <FormPageTemplate<NewCounterGroup>
-      label="Edit Counter"
-      validator={counterGroupValidator}
+    <CounterGroupForm
+      label="Edit Group"
+      counterGroup={group}
       onSubmit={onSubmit}
-      defaultValues={group}
-    >
-      {(register, errors, control) => (
-        <CounterGroupFields
-          register={register}
-          errors={errors}
-          control={control}
-        />
-      )}
-    </FormPageTemplate>
+    />
   );
 }
