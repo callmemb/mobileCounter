@@ -1,5 +1,5 @@
 import { useForm, Validator } from "@tanstack/react-form";
-import { NewCounterGroup, counterGroupValidator } from "../../definitions";
+import { NewCounterGroup, newCounterGroupValidator } from "../../definitions";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import FormPageTemplate from "../pageTemplate/formPageTemplate";
 import TextInput from "./components/textInput";
@@ -19,7 +19,7 @@ export default function CounterGroupForm(props: CounterGroupFormProps) {
     onSubmit: onSubmit,
     validatorAdapter: zodValidator(),
     validators: {
-      onChange: counterGroupValidator,
+      onChange: newCounterGroupValidator,
     },
   });
 

@@ -66,7 +66,10 @@ export const counterActionDayAggregatedValidator = z.object({
 export const counterActionMonthAggregatedValidator = z.object({
   counterId: z.string(),
   value: z.coerce.number().min(1),
-  month: z.string().date(),
+  month: z.string().regex(
+    /^\d{2}-\d{4}$/,
+    "Invalid date format, should be 'MM-YYYY'"
+  ),
 });
 
 export const dayLabelFromOptions = ["startOfRange", "endOfRange"] as const;

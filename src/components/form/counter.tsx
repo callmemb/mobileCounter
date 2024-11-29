@@ -1,5 +1,5 @@
 import { useForm, Validator } from "@tanstack/react-form";
-import { NewCounter, SelectOption, counterValidator } from "../../definitions";
+import { NewCounter, SelectOption, newCounterValidator } from "../../definitions";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import FormPageTemplate from "../pageTemplate/formPageTemplate";
 import TextInput from "./components/textInput";
@@ -23,7 +23,7 @@ export default function CounterForm(props: CounterFormProps) {
     onSubmit: onSubmit,
     validatorAdapter: zodValidator(),
     validators: {
-      onChange: counterValidator,
+      onChange: newCounterValidator
     },
   });
 
@@ -90,9 +90,6 @@ export default function CounterForm(props: CounterFormProps) {
       <Box sx={{ display: "flex", gap: 1 }}>
         <form.Field
           name="defaultNumberOfSteps"
-          validators={{
-            onChangeListenTo: ["maxNumberOfSteps"],
-          }}
           children={(field) => (
             <NumberInput
               id={field.name}
