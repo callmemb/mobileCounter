@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import NumberInput from "../form/components/numberInput";
+import theme from "../../theme";
+import { Box } from "@mui/material";
 
 type CounterValueInputProps = {
   label: string;
@@ -66,22 +68,30 @@ export default function CounterValueInput({
 
   return (
     <form action="" onSubmit={onSubmit}>
-      <NumberInput
-        type="number"
-        popupErrors
-        label={label}
-        errorMessage={errors}
-        value={value}
-        onChange={(v) => setValue(v)}
-        onBlur={resetToDefault}
-        slotProps={{
-          htmlInput: {
-            min: minStep * stepSize,
-            max: maxStep * stepSize,
-            step: stepSize,
-          },
+      <Box
+        sx={{
+          borderRadius: 1,
+          padding: 1,
+          background: theme.palette.background.paper,
         }}
-      />
+      >
+        <NumberInput
+          type="number"
+          popupErrors
+          label={label}
+          errorMessage={errors}
+          value={value}
+          onChange={(v) => setValue(v)}
+          onBlur={resetToDefault}
+          slotProps={{
+            htmlInput: {
+              min: minStep * stepSize,
+              max: maxStep * stepSize,
+              step: stepSize,
+            },
+          }}
+        />
+      </Box>
     </form>
   );
 }

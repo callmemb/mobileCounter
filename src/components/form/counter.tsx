@@ -1,5 +1,9 @@
 import { useForm, Validator } from "@tanstack/react-form";
-import { NewCounter, SelectOption, newCounterValidator } from "../../definitions";
+import {
+  NewCounter,
+  SelectOption,
+  newCounterValidator,
+} from "../../definitions";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import FormPageTemplate from "../pageTemplate/formPageTemplate";
 import TextInput from "./components/textInput";
@@ -7,6 +11,7 @@ import IconPicker from "./components/iconPicker";
 import SelectInput from "./components/selectInput";
 import NumberInput from "./components/numberInput";
 import { Box } from "@mui/material";
+import ImagePicker from "./components/imagePicker";
 
 interface CounterFormProps {
   label: string;
@@ -23,7 +28,7 @@ export default function CounterForm(props: CounterFormProps) {
     onSubmit: onSubmit,
     validatorAdapter: zodValidator(),
     validators: {
-      onChange: newCounterValidator
+      onChange: newCounterValidator,
     },
   });
 
@@ -210,6 +215,25 @@ export default function CounterForm(props: CounterFormProps) {
               { label: "Friday", value: 5 },
               { label: "Saturday", value: 6 },
             ]}
+            errorMessage={
+              field.state.meta.isTouched
+                ? field.state.meta.errors.join(",")
+                : ""
+            }
+          />
+        )}
+      />
+
+      <form.Field
+        name="faceImageId"
+        children={(field) => (
+          <ImagePicker
+            id={field.name}
+            name={field.name}
+            value={field.state.value}
+            onBlur={field.handleBlur}
+            onChange={field.handleChange}
+            label="Image"
             errorMessage={
               field.state.meta.isTouched
                 ? field.state.meta.errors.join(",")

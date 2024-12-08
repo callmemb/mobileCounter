@@ -22,6 +22,7 @@ function RouteComponent() {
     useState<(Counter & { groupName?: string })[]>(storeCounters);
 
   // Sync with store when it updates
+  // Used useEffect approach to handle lag.
   useEffect(() => {
     setLocalCounters(
       storeCounters.map((c) => ({

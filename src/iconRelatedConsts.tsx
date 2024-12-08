@@ -160,13 +160,17 @@ export const iconNames = Object.keys(iconMap);
 
 export function searchForIconNames(
   searchTerm: string,
+  page: number = 1,
   limit: number = 16
 ): IconNameType[] {
-  return iconNames
-    .filter((name): name is IconNameType =>
-      name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .slice(0, limit);
+  const filteredNames = iconNames.filter((name): name is IconNameType =>
+    name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  
+  return filteredNames.slice(startIndex, endIndex);
 }
 
 export default iconMap;

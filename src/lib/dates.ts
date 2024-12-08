@@ -26,6 +26,18 @@ export function isDaysTheSame(
   );
 }
 
+export function getDate(
+  date: Date,
+  breakPointTime: Settings["dailyStepsResetTime"] = "0:0:0",
+  labelFrom: Settings["dayLabelFrom"] = "startOfRange",
+  format: string = "DD-MM-YYYY"
+): string {
+  return dayjs(date)
+    .add(breakPointTime > dayjs(date).format("HH:mm:ss") ? -1 : 0, "d")
+    .add(labelFrom === "endOfRange" ? 1 : 0, "d")
+    .format(format);
+}
+
 export function getDayOfWeek(
   date: Date,
   breakPointTime: Settings["dailyStepsResetTime"] = "0:0:0",

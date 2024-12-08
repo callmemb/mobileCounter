@@ -102,7 +102,6 @@ const SlidingButton = styled(Button)(({ theme }) => ({
       willChange: "transform",
       transform: "scale(0,1)",
       transition: "transform 0.2s",
-      transitionDelay: "0.4s",
       display: "flex",
       alignItems: "center",
     },

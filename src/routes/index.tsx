@@ -9,7 +9,7 @@ import {
   TextSnippet,
   Undo,
 } from "@mui/icons-material";
-import { store, useCounterGroups, useCounters } from "../store";
+import { store, useCounterGroups, useCounters, useImage } from "../store";
 import { z } from "zod";
 import { Stack } from "@mui/material";
 import CircularSlider from "../components/circularSlider/component";
@@ -133,6 +133,7 @@ function CircularSliderWithActionMemory({
   navigate: ReturnType<typeof useNavigate>;
 }) {
   const [actions, setActions] = useState([] as CounterAction[]);
+  const bgImage = useImage(c.faceImageId);
 
   return (
     <CircularSlider
@@ -155,6 +156,7 @@ function CircularSliderWithActionMemory({
       stepsGoal={c.dailyGoalOfSteps}
       unitName={c.unitsName}
       label={c.label}
+      bgImage={bgImage?.data}
       tools={[
         ...(actions.length > 0
           ? [

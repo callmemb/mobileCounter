@@ -91,6 +91,44 @@ export default function SettingsForm(props: SettingsFormProps) {
           />
         )}
       />
+
+      <form.Field
+        name="counterDayAggregatesDaysToLive"
+        children={(field) => (
+          <NumberInput
+            id={field.name}
+            name={field.name}
+            value={field.state.value}
+            onBlur={field.handleBlur}
+            onChange={field.handleChange}
+            label="Counter 'day stats' days to live"
+            errorMessage={
+              field.state.meta.isTouched
+                ? field.state.meta.errors.join(",")
+                : ""
+            }
+          />
+        )}
+      />
+
+      <form.Field
+        name="counterMonthAggregatesMonthsToLive"
+        children={(field) => (
+          <NumberInput
+            id={field.name}
+            name={field.name}
+            value={field.state.value}
+            onBlur={field.handleBlur}
+            onChange={field.handleChange}
+            label="Counter 'month stats' months to live"
+            errorMessage={
+              field.state.meta.isTouched
+                ? field.state.meta.errors.join(",")
+                : ""
+            }
+          />
+        )}
+      />
     </FormPageTemplate>
   );
 }

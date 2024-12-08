@@ -21,6 +21,34 @@ const MIN_MAX_DEG_DELTA = MAX_DEG - MIN_DEG;
 /** half point on neutral zone of circle */
 const BREAKING_POINT_TO_LOOP_DEG_BACK_TO_ZERO = MAX_DEG + (360 - MAX_DEG) / 2;
 
+const shadowColor = "rgba(255,255,255,.5)";
+const textShadow = {
+  "h6, span": {
+    backgroundColor: "rgba(255,255,255,.2)",
+    borderRadius: 1,
+    paddingInline: '1em',
+    paddingBlock: '.3em'
+  },
+  textShadow: `
+          -2px -2px 14px ${shadowColor},
+          -2px -2px 14px ${shadowColor},
+          0px  -2px 14px ${shadowColor},
+          0px  -2px 14px ${shadowColor},
+          2px  -2px 14px ${shadowColor},
+          2px  -2px 14px ${shadowColor},
+          -2px  0px 14px ${shadowColor},
+          -2px  0px 14px ${shadowColor},
+          1px   0px 2px ${shadowColor},
+          1px   0px 2px ${shadowColor},
+          -1px  1px 2px ${shadowColor},
+          -1px  1px 2px ${shadowColor},
+          0px   1px 2px ${shadowColor},
+          0px   1px 2px ${shadowColor},
+          1px   1px 2px ${shadowColor};
+          1px   1px 2px ${shadowColor};
+          `,
+};
+
 type CircularSliderProps = {
   onChange: (value: number) => void;
   stepsGoal: number;
@@ -32,6 +60,7 @@ type CircularSliderProps = {
   unitName?: string;
   label: string;
   id: string;
+  bgImage?: string;
   tools: {
     id: string;
     icon: React.ReactNode;
@@ -45,7 +74,7 @@ export default function CircularSlider({
   onChange,
   cumulatedSteps = 0,
   stepsGoal = 0,
-
+  bgImage,
   // step is current counter value
   defaultStep = 10,
   minStep = 0,
@@ -229,11 +258,15 @@ export default function CircularSlider({
         touchAction: "none",
         border: `1px solid`,
         borderColor: theme.palette.grey[300],
+        background: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
       <ProgressBar
-        onRadius={100}
-        size={3}
+        key="grayBg"
+        onRadius={101}
+        size={4}
         ranges={[
           { color: theme.palette.grey[300], value: `${MIN_DEG}deg` },
           { color: theme.palette.grey[300], value: `${MAX_DEG}deg` },
@@ -243,6 +276,7 @@ export default function CircularSlider({
         }}
       />
       <ProgressBar
+        key="scale"
         onRadius={100}
         size={12}
         ranges={rangeArenas}
@@ -251,8 +285,9 @@ export default function CircularSlider({
         }}
       />
       <ProgressBar
+        key="active"
         onRadius={100}
-        size={2}
+        size={3}
         ranges={[
           { color: theme.palette.secondary.main, value: "var(--value-deg)" },
         ]}
@@ -263,8 +298,8 @@ export default function CircularSlider({
       />
       <ProgressBar
         key="cumulated"
-        onRadius={97}
-        size={4}
+        onRadius={96}
+        size={5}
         ranges={[
           { color: theme.palette.primary.main, value: `var(--value2-deg)` },
           {
@@ -288,9 +323,18 @@ export default function CircularSlider({
           borderRadius: "50%",
           aspectRatio: 1,
           textAlign: "center",
+          overflow: "clip",
+          width: "85%",
+          ...textShadow,
         }}
       >
-        <Box>
+        <Box
+          sx={{
+            opacity: isDragging ? 1 : 0,
+            transform: `translateX(${isDragging ? "0" : "-50%"})`,
+            transition: "opacity 0.5s, transform 0.5s",
+          }}
+        >
           <Typography variant="h6">
             + {stepValue} {unitName}
           </Typography>
@@ -303,21 +347,25 @@ export default function CircularSlider({
 
       <Box // label
         sx={{
-          opacity: isDragging ? 0 : 1,
           position: "absolute",
           display: "grid",
           placeItems: "center",
           borderRadius: "50%",
           aspectRatio: 1,
-          transition: "opacity 0.5s",
-          background: theme.palette.background.paper,
           width: "85%",
-          overflow: "hidden",
           fontOversize: "ellipsis",
           textAlign: "center",
+          overflow: "clip",
+          ...textShadow,
         }}
       >
-        <Box>
+        <Box
+          sx={{
+            opacity: isDragging ? 0 : 1,
+            transform: `translateX(${isDragging ? "50%" : "0%"})`,
+            transition: "opacity 0.5s, transform 0.5s",
+          }}
+        >
           <Typography variant="h6">{label}</Typography>
           <Typography variant="caption" color="text.secondary">
             {cumulatedSteps >= stepsGoal
@@ -341,7 +389,7 @@ export default function CircularSlider({
           placeItems: "center",
           borderRadius: "50%",
           aspectRatio: 1,
-          background: theme.palette.background.paper,
+          // background: theme.palette.background.paper,
           transition: "opacity 0.5s",
           width: "80%",
           overflow: "hidden",
