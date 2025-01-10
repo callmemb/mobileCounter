@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { store, useCounterGroup } from "../../store";
+import { store } from "../../store";
 import { NewCounterGroup } from "../../definitions";
 import CounterGroupForm from "../../components/form/counterGroup";
 
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/groups/$id")({
 function RouteComponent() {
   const { id } = Route.useParams();
 
-  const group = useCounterGroup(id);
+  const group = store.useCounterGroup(id);
   const navigate = useNavigate();
 
   const onSubmit = async ({ value }: { value: NewCounterGroup }) => {

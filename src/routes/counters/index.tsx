@@ -2,9 +2,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import PageTemplate from "../../components/pageTemplate/component";
 import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
 import { AddCircle, ArrowLeft, Delete, Edit, Info } from "@mui/icons-material";
-import { store, useCounterGroups, useCounters } from "../../store";
+import { store } from "../../store";
 import { SortableList } from "../../components/sortableList/component";
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import { Counter } from "../../definitions";
 import ConfirmationDialog from "../../components/confirmDialog/component";
@@ -16,8 +23,8 @@ export const Route = createFileRoute("/counters/")({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const storeCounters = useCounters(null);
-  const groups = useCounterGroups();
+  const storeCounters = store.useCounters(null);
+  const groups = store.useCounterGroups();
   const [localCounters, setLocalCounters] =
     useState<(Counter & { groupName?: string })[]>(storeCounters);
 
@@ -96,28 +103,10 @@ function RouteComponent() {
                 </Typography>
                 <SortableList.DragHandle />
               </Box>
-              <Typography variant="caption" px={2}>{counter.groupName}</Typography>
-              <Stack direction="row" spacing={1}>
-                <ConfirmationDialog
-                  title="Delete Counter"
-                  description="Are you sure you want to delete this group?"
-                  response={() => {
-                    store.deleteCounter(counter.id);
-                  }}
-                  confirmButtonProps={{ color: "error" }}
-                >
-                  {(showDialog) => (
-                    <Tooltip title="Delete">
-                      <IconButton
-                        color="warning"
-                        aria-label="delete"
-                        onClick={showDialog}
-                      >
-                        <Delete fontSize="inherit" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </ConfirmationDialog>
+              <Typography variant="caption" px={2}>
+                {counter.groupName}
+              </Typography>
+              <Stack direction="row" justifyContent='center' spacing={1}>
                 <Tooltip title="Edit">
                   <IconButton
                     color="info"
@@ -144,6 +133,27 @@ function RouteComponent() {
                     <Info fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
+                <Divider orientation="vertical" flexItem />
+                <ConfirmationDialog
+                  title="Delete Counter"
+                  description="Are you sure you want to delete this group?"
+                  response={() => {
+                    store.deleteCounter(counter.id);
+                  }}
+                  confirmButtonProps={{ color: "error" }}
+                >
+                  {(showDialog) => (
+                    <Tooltip title="Delete">
+                      <IconButton
+                        color="warning"
+                        aria-label="delete"
+                        onClick={showDialog}
+                      >
+                        <Delete fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </ConfirmationDialog>
               </Stack>
             </Box>
           </SortableList.Item>

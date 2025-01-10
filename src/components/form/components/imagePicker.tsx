@@ -23,7 +23,7 @@ import {
 } from "@mui/icons-material";
 import { debounce } from "../../../lib/debounce";
 import TextInput, { TextInputProps } from "./textInput";
-import { store, useImage, useImages } from "../../../store";
+import { store } from "../../../store";
 import { Image, Image as ImageType } from "../../../definitions";
 
 type ImagePickerProps = Omit<TextInputProps, "onChange"> & {
@@ -48,12 +48,12 @@ export default function ImagePicker({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const selectedImage = useImage(value);
+  const selectedImage = store.useImage(value);
 
   const ITEMS_PER_PAGE = 9;
   const ITEMS_PER_ROW = 3;
 
-  const { images: filteredImages, hasMore } = useImages(
+  const { images: filteredImages, hasMore } = store.useImages(
     searchTerm,
     page,
     ITEMS_PER_PAGE

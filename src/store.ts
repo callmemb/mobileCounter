@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   Counter,
@@ -16,11 +17,11 @@ import {
   Settings,
   settingsValidator,
 } from "./definitions";
-import { db } from "./store/indexDB";
+import { createDB, DB } from "./store/indexDB";
 import { v4 as genId } from "uuid";
 import { generateKeyBetween } from "./lib/generateKeyBetween";
 import dayjs from "dayjs";
-import { getDate, getDayOfWeek, isDaysTheSame } from "./lib/dates";
+import { getStringDate, getDayOfWeek, isDaysTheSame } from "./lib/dates";
 
 type StoreResponse<T> = {
   errorMessage?: string;
@@ -28,7 +29,13 @@ type StoreResponse<T> = {
   record?: T;
 };
 
-class Store {
+export class Store {
+  db: DB;
+
+  constructor(name?: string) {
+    this.db = createDB(name);
+  }
+
   async upsertCounter(
     record: NewCounter | Counter
   ): Promise<StoreResponse<Counter>> {
@@ -36,7 +43,7 @@ class Store {
       let defaults = {};
       if (!("id" in record)) {
         const firstCounter =
-          (await db.counters.limit(1).first())?.order || null;
+          (await this.db.counters.limit(1).first())?.order || null;
         const order = generateKeyBetween(null, firstCounter);
         defaults = { id: genId(), order: order, currentSteps: 0 };
       }
@@ -44,14 +51,14 @@ class Store {
         ...record,
         ...defaults,
       });
-      const group = await db.counterGroups.get(validatedRecord.groupId);
+      const group = await this.db.counterGroups.get(validatedRecord.groupId);
       if (!group) {
         return {
           errorMessage: "Group not found",
           id: "id" in record ? record.id : undefined,
         };
       }
-      await db.counters.put(validatedRecord);
+      await this.db.counters.put(validatedRecord);
       return { id: validatedRecord.id, record: validatedRecord };
     } catch (error) {
       return {
@@ -62,11 +69,28 @@ class Store {
   }
   async deleteCounter(id: Counter["id"]): Promise<StoreResponse<Counter>> {
     try {
-      return await db
-        .transaction("rw", db.counterActions, db.counters, async () => {
-          await db.counterActions.where("counterId").equals(id).delete();
-          await db.counters.delete(id);
-        })
+      return await this.db
+        .transaction(
+          "rw",
+          [
+            this.db.counterActions,
+            this.db.counters,
+            this.db.counterActionsByDay,
+            this.db.counterActionsByMonth,
+          ],
+          async () => {
+            await this.db.counterActions.where("counterId").equals(id).delete();
+            await this.db.counterActionsByDay
+              .where("counterId")
+              .equals(id)
+              .delete();
+            await this.db.counterActionsByMonth
+              .where("counterId")
+              .equals(id)
+              .delete();
+            await this.db.counters.delete(id);
+          }
+        )
         .then(() => {
           return { id };
         });
@@ -84,7 +108,7 @@ class Store {
       let defaults = {};
       if (!("id" in record)) {
         const firstCounter =
-          (await db.counterGroups.limit(1).first())?.order || null;
+          (await this.db.counterGroups.limit(1).first())?.order || null;
         const order = generateKeyBetween(null, firstCounter);
         defaults = { id: genId(), order: order };
       }
@@ -92,7 +116,7 @@ class Store {
         ...record,
         ...defaults,
       });
-      await db.counterGroups.put(validatedRecord);
+      await this.db.counterGroups.put(validatedRecord);
       return { id: validatedRecord.id, record: validatedRecord };
     } catch (error) {
       return {
@@ -105,11 +129,27 @@ class Store {
     id: CounterGroup["id"]
   ): Promise<StoreResponse<CounterGroup>> {
     try {
-      return await db
-        .transaction("rw", db.counters, db.counterGroups, async () => {
-          await db.counters.where("groupId").equals(`${id}`).delete();
-          await db.counterGroups.delete(id);
-        })
+      return await this.db
+        .transaction(
+          "rw",
+          [
+            this.db.counters,
+            this.db.counterGroups,
+            this.db.counterActions,
+            this.db.counterActionsByDay,
+            this.db.counterActionsByMonth,
+          ],
+          async () => {
+            const counters = await this.db.counters
+              .where("groupId")
+              .equals(id)
+              .toArray();
+            for (const counter of counters) {
+              await this.deleteCounter(counter.id);
+            }
+            await this.db.counterGroups.delete(id);
+          }
+        )
         .then(() => {
           return { id };
         });
@@ -130,24 +170,24 @@ class Store {
         date: new Date(),
         ...record,
       });
-      await db.transaction(
+      await this.db.transaction(
         "rw",
         [
-          db.counters,
-          db.counterActions,
-          db.counterActionsByDay,
-          db.counterActionsByMonth,
-          db.settings,
+          this.db.counters,
+          this.db.counterActions,
+          this.db.counterActionsByDay,
+          this.db.counterActionsByMonth,
+          this.db.settings,
         ],
         async () => {
-          const counter = await db.counters.get(validatedRecord.counterId);
+          const counter = await this.db.counters.get(validatedRecord.counterId);
           if (!counter) {
             return { errorMessage: "Counter not found" };
           }
           counter.currentSteps += validatedRecord.value / counter.unitsInStep;
-          await db.counters.put(counter);
-          await db.counterActions.put(validatedRecord);
-          await handleActionAggregation(validatedRecord);
+          await this.db.counters.put(counter);
+          await this.db.counterActions.put(validatedRecord);
+          await handleActionAggregation(this.db, validatedRecord);
         }
       );
       return { id: validatedRecord.id, record: validatedRecord };
@@ -162,27 +202,27 @@ class Store {
     id: CounterAction["id"]
   ): Promise<StoreResponse<CounterAction>> {
     try {
-      const counterAction = await db.counterActions.get(id);
+      const counterAction = await this.db.counterActions.get(id);
       if (!counterAction) {
         return { errorMessage: "Action not found", id };
       }
-      const counter = await db.counters.get(counterAction.counterId);
+      const counter = await this.db.counters.get(counterAction.counterId);
       if (!counter) {
         return { errorMessage: "Counter not found", id: id };
       }
-      const settings = await db.settings.get("0");
-      return await db
+      const settings = await this.db.settings.get("0");
+      return await this.db
         .transaction(
           "rw",
           [
-            db.counters,
-            db.counterActions,
-            db.counterActionsByDay,
-            db.counterActionsByMonth,
-            db.settings,
+            this.db.counters,
+            this.db.counterActions,
+            this.db.counterActionsByDay,
+            this.db.counterActionsByMonth,
+            this.db.settings,
           ],
           async () => {
-            await handleActionAggregation(counterAction, true);
+            await handleActionAggregation(this.db, counterAction, true);
             if (
               isDaysTheSame(
                 new Date(),
@@ -193,13 +233,13 @@ class Store {
               const newCurrentSteps =
                 counter.currentSteps -
                 counterAction.value / counter.unitsInStep;
-              await db.counters.put({
+              await this.db.counters.put({
                 ...counter,
                 currentSteps: newCurrentSteps,
               });
             }
 
-            await db.counterActions.delete(id);
+            await this.db.counterActions.delete(id);
           }
         )
         .then(() => {
@@ -213,38 +253,18 @@ class Store {
     }
   }
 
-  /**
-   * Deletes all counter actions older than the number of days specified in the settings
-   * Does not touch any aggregated values.
-   */
-  async deleteOldCounterActions() {
-    const settings = await db.settings.get("0");
-    if (!(settings?.counterActionDaysToLive && settings?.dailyStepsResetTime)) {
-      return;
-    }
-    const ttl = settings?.counterActionDaysToLive;
-    const [hh, mm, ss] = settings.dailyStepsResetTime.split(":");
-    const tmp = dayjs().set("h", +hh).set("m", +mm).set("s", +ss);
-    const dateLimit = (tmp.isAfter(dayjs()) ? tmp : tmp.add(1, "d")).add(
-      ttl,
-      "d"
-    );
-    // Dexie might have a bug, comparing above and below works in reverse
-    await db.counterActions.where("date").above(dateLimit.toDate()).delete();
-  }
-
   async moveCounter(
     counterId: Counter["id"],
     afterCounterId?: Counter["id"],
     beforeCounterId?: Counter["id"]
   ): Promise<StoreResponse<Counter>> {
-    const counter = await db.counters.get(counterId);
+    const counter = await this.db.counters.get(counterId);
     if (!counter) {
       return { errorMessage: "Counter not found" };
     }
     let orderBefore: string | null = null;
     if (afterCounterId) {
-      const afterCounter = await db.counters.get(afterCounterId);
+      const afterCounter = await this.db.counters.get(afterCounterId);
       if (!afterCounter) {
         return { errorMessage: "After Counter not found" };
       }
@@ -252,7 +272,7 @@ class Store {
     }
     let orderAfter: string | null = null;
     if (beforeCounterId) {
-      const beforeCounter = await db.counters.get(beforeCounterId);
+      const beforeCounter = await this.db.counters.get(beforeCounterId);
       if (!beforeCounter) {
         return { errorMessage: "Before Counter not found" };
       }
@@ -260,7 +280,7 @@ class Store {
     }
     const order = generateKeyBetween(orderBefore, orderAfter);
     const record = { ...counter, order };
-    await db.counters.put(record);
+    await this.db.counters.put(record);
     return { id: counter.id, record };
   }
 
@@ -269,13 +289,14 @@ class Store {
     afterCounterGroupId?: CounterGroup["id"],
     beforeCounterGroupId?: CounterGroup["id"]
   ): Promise<StoreResponse<CounterGroup>> {
-    const counterGroup = await db.counterGroups.get(counterGroupId);
+    const counterGroup = await this.db.counterGroups.get(counterGroupId);
     if (!counterGroup) {
       return { errorMessage: "CounterGroup not found" };
     }
     let orderBefore: string | null = null;
     if (afterCounterGroupId) {
-      const afterCounterGroup = await db.counterGroups.get(afterCounterGroupId);
+      const afterCounterGroup =
+        await this.db.counterGroups.get(afterCounterGroupId);
       if (!afterCounterGroup) {
         return { errorMessage: "After CounterGroup not found" };
       }
@@ -284,7 +305,7 @@ class Store {
     let orderAfter: string | null = null;
     if (beforeCounterGroupId) {
       const beforeCounterGroup =
-        await db.counterGroups.get(beforeCounterGroupId);
+        await this.db.counterGroups.get(beforeCounterGroupId);
       if (!beforeCounterGroup) {
         return { errorMessage: "Before CounterGroup not found" };
       }
@@ -292,12 +313,12 @@ class Store {
     }
     const order = generateKeyBetween(orderBefore, orderAfter);
     const record = { ...counterGroup, order };
-    await db.counterGroups.put(record);
+    await this.db.counterGroups.put(record);
     return { id: counterGroup.id, record };
   }
 
   async getSettings(): Promise<Settings | undefined> {
-    return db.settings.get("0");
+    return this.db.settings.get("0");
   }
 
   async upsertSettings(record: Settings): Promise<StoreResponse<Settings>> {
@@ -307,20 +328,13 @@ class Store {
         ...record,
         id: "0",
       });
-      await db.settings.put(validatedRecord);
+      await this.db.settings.put(validatedRecord);
       return { record };
     } catch (error) {
       return {
         errorMessage: error instanceof Error ? error.message : "Unknown error",
       };
     }
-  }
-
-  async clearAllCurrentSteps() {
-    return await db.transaction("rw", db.counters, db.settings, async () => {
-      await db.counters.toCollection().modify({ currentSteps: 0 });
-      await db.settings.update("0", { lastDailyStepResetDate: new Date() });
-    });
   }
 
   async addImage(file: File): Promise<StoreResponse<Image>> {
@@ -338,7 +352,7 @@ class Store {
         data: base64Data,
         uploadedAt: new Date(),
       });
-      await db.images.put(validatedRecord);
+      await this.db.images.put(validatedRecord);
       return { id: validatedRecord.id, record: validatedRecord };
     } catch (error) {
       return {
@@ -349,7 +363,7 @@ class Store {
 
   async deleteImage(id: Image["id"]): Promise<StoreResponse<Image>> {
     try {
-      const connectedCounter = await db.counters
+      const connectedCounter = await this.db.counters
         .where("faceImageId")
         .equals(id)
         .first();
@@ -362,7 +376,7 @@ class Store {
         };
       }
 
-      await db.images.delete(id);
+      await this.db.images.delete(id);
       return { id };
     } catch (error) {
       return {
@@ -371,144 +385,205 @@ class Store {
       };
     }
   }
-}
-export const store = new Store();
 
-export function useCounter(id: Counter["id"]) {
-  return useLiveQuery(() => db.counters.get(id), [id]);
-}
+  async clearAllCurrentSteps() {
+    return await this.db.transaction(
+      "rw",
+      this.db.counters,
+      this.db.settings,
+      async () => {
+        await this.db.counters.toCollection().modify({ currentSteps: 0 });
+        await this.db.settings.update("0", {
+          lastDailyStepResetDate: new Date(),
+        });
+      }
+    );
+  }
 
-export function useCounters(
-  groupId: CounterGroup["id"] | null,
-  filterByActiveDays = false
-) {
-  const settings = useSettings();
-  const { dailyStepsResetTime, dayLabelFrom } = settings || {};
+  /**
+   * Deletes all counter actions older than the number of days specified in the settings
+   * Does not touch any aggregated values.
+   */
+  async deleteOldCounterActions() {
+    const settings = await this.db.settings.get("0");
+    if (!(settings?.counterActionDaysToLive && settings?.dailyStepsResetTime)) {
+      return;
+    }
+    const ttl = settings?.counterActionDaysToLive;
+    const [hh, mm, ss] = settings.dailyStepsResetTime.split(":");
+    const currentDay = getStringDate(
+      new Date(),
+      settings.dailyStepsResetTime,
+      settings.dayLabelFrom,
+      "YYYY-MM-DD"
+    );
+    const breakPoint = dayjs(
+      `${currentDay} ${hh}:${mm}:${ss}`,
+      "YYYY-MM-DD HH:mm:ss"
+    ).subtract(ttl, "day");
+    await this.db.counterActions
+      .where("date")
+      .below(breakPoint.toDate())
+      .delete();
+  }
 
-  const currentDayOfWeek = getDayOfWeek(
-    new Date(),
-    dailyStepsResetTime,
-    dayLabelFrom
-  );
-  return (
-    useLiveQuery(async () => {
-      const result = groupId
-        ? await db.counters
-            .where("groupId")
-            .equals(groupId)
-            .and(
-              ({ activeDaysOfWeek = [] }) =>
-                !filterByActiveDays ||
-                activeDaysOfWeek.includes(currentDayOfWeek)
+  async deleteOldAggregations() {
+    const settings = await this.db.settings.get("0");
+    if (
+      !(
+        settings?.counterDayAggregatesDaysToLive &&
+        settings?.counterMonthAggregatesMonthsToLive
+      )
+    ) {
+      return;
+    }
+  }
+
+  useCounter(id: Counter["id"]) {
+    return useLiveQuery(() => this.db.counters.get(id), [id]);
+  }
+
+  useCounters(groupId: CounterGroup["id"] | null, filterByActiveDays = false) {
+    const settings = this.useSettings();
+    const { dailyStepsResetTime, dayLabelFrom } = settings || {};
+
+    const currentDayOfWeek = getDayOfWeek(
+      new Date(),
+      dailyStepsResetTime,
+      dayLabelFrom
+    );
+    return (
+      useLiveQuery(async () => {
+        const result = groupId
+          ? await this.db.counters
+              .where("groupId")
+              .equals(groupId)
+              .and(
+                ({ activeDaysOfWeek = [] }) =>
+                  !filterByActiveDays ||
+                  activeDaysOfWeek.includes(currentDayOfWeek)
+              )
+              .toArray()
+          : await this.db.counters
+              .orderBy("order")
+              .and(
+                ({ activeDaysOfWeek = [] }) =>
+                  !filterByActiveDays ||
+                  activeDaysOfWeek.includes(currentDayOfWeek)
+              )
+              .toArray();
+
+        return result || [];
+      }, [groupId, filterByActiveDays]) || []
+    );
+  }
+
+  useCounterGroup(id: CounterGroup["id"] | null) {
+    return useLiveQuery(
+      () => (id ? this.db.counterGroups.get(id) : undefined),
+      [id]
+    );
+  }
+
+  useCounterGroups() {
+    return (
+      useLiveQuery(
+        async () => await this.db.counterGroups.orderBy("order").toArray(),
+        []
+      ) || []
+    );
+  }
+
+  useCounterActions(counterId: Counter["id"]) {
+    return (
+      useLiveQuery(
+        async () =>
+          await this.db.counterActions
+            .where("counterId")
+            .equals(counterId)
+            .reverse()
+            .toArray(),
+        [counterId]
+      ) || []
+    );
+  }
+
+  useImage(id: Image["id"] | undefined) {
+    return useLiveQuery(() => (id ? this.db.images.get(id) : undefined), [id]);
+  }
+
+  useImages(name?: Image["name"], page = 1, itemsPerPage = 9) {
+    return (
+      useLiveQuery(async () => {
+        const collection = name
+          ? this.db.images.filter((image) =>
+              image.name.toLowerCase().includes(name.toLowerCase())
             )
-            .toArray()
-        : await db.counters
-            .orderBy("order")
-            .and(
-              ({ activeDaysOfWeek = [] }) =>
-                !filterByActiveDays ||
-                activeDaysOfWeek.includes(currentDayOfWeek)
-            )
-            .toArray();
+          : this.db.images;
 
-      return result || [];
-    }, [groupId, filterByActiveDays]) || []
-  );
-}
+        const offset = (page - 1) * itemsPerPage;
+        const images = await collection
+          .offset(offset)
+          .limit(itemsPerPage + 1)
+          .toArray();
 
-export function useCounterGroup(id: CounterGroup["id"] | null) {
-  return useLiveQuery(() => (id ? db.counterGroups.get(id) : undefined), [id]);
-}
+        const hasMore = images.length > itemsPerPage;
+        return {
+          images: images.slice(0, itemsPerPage),
+          hasMore,
+        };
+      }, [name, page, itemsPerPage]) || { images: [], hasMore: false }
+    );
+  }
 
-export function useCounterGroups() {
-  return (
-    useLiveQuery(
-      async () => await db.counterGroups.orderBy("order").toArray(),
-      []
-    ) || []
-  );
-}
-export function useCounterActions(counterId: Counter["id"]) {
-  return (
-    useLiveQuery(
-      async () =>
-        await db.counterActions
+  useCounterActionsByDay(counterId: Counter["id"]) {
+    return (
+      useLiveQuery(async () => {
+        return await this.db.counterActionsByDay
           .where("counterId")
           .equals(counterId)
           .reverse()
-          .toArray(),
-      [counterId]
-    ) || []
-  );
+          .toArray();
+      }, [counterId]) || []
+    );
+  }
+
+  useCounterActionsByMonth(counterId: Counter["id"]) {
+    return (
+      useLiveQuery(async () => {
+        return await this.db.counterActionsByMonth
+          .where("counterId")
+          .equals(counterId)
+          .reverse()
+          .toArray();
+      }, [counterId]) || []
+    );
+  }
+
+  useSettings() {
+    return useLiveQuery(() => this.db.settings.get("0"), []);
+  }
+
+  deleteAllData() {
+    return this.db.delete();
+  }
 }
 
-export function useImage(id: Image["id"] | undefined) {
-  return useLiveQuery(() => (id ? db.images.get(id) : undefined), [id]);
-}
-
-export function useImages(name?: Image["name"], page = 1, itemsPerPage = 9) {
-  return (
-    useLiveQuery(async () => {
-      const collection = name
-        ? db.images.filter((image) =>
-            image.name.toLowerCase().includes(name.toLowerCase())
-          )
-        : db.images;
-
-      const offset = (page - 1) * itemsPerPage;
-      const images = await collection
-        .offset(offset)
-        .limit(itemsPerPage + 1) // Get one extra to check if there's more
-        .toArray();
-
-      const hasMore = images.length > itemsPerPage;
-      return {
-        images: images.slice(0, itemsPerPage),
-        hasMore,
-      };
-    }, [name, page, itemsPerPage]) || { images: [], hasMore: false }
-  );
-}
-
-export function useCounterActionsByDay(counterId: Counter["id"]) {
-  return (
-    useLiveQuery(async () => {
-      return await db.counterActionsByDay
-        .where("counterId")
-        .equals(counterId)
-        .reverse()
-        .toArray();
-    }, [counterId]) || []
-  );
-}
-export function useCounterActionsByMonth(counterId: Counter["id"]) {
-  return (
-    useLiveQuery(async () => {
-      return await db.counterActionsByMonth
-        .where("counterId")
-        .equals(counterId)
-        .reverse()
-        .toArray();
-    }, [counterId]) || []
-  );
-}
-
-export function useSettings() {
-  return useLiveQuery(() => db.settings.get("0"), []);
-}
+export const store = new Store();
 
 async function handleActionAggregation(
+  db: DB,
   action: CounterAction,
   remove: boolean = false
 ) {
   const settings = await db.settings.get("0");
-  const day = getDate(
+  const day = getStringDate(
     action.date,
     settings?.dailyStepsResetTime,
     settings?.dayLabelFrom,
     "YYYY-MM-DD"
   );
-  const month = getDate(
+  const month = getStringDate(
     action.date,
     settings?.dailyStepsResetTime,
     settings?.dayLabelFrom,

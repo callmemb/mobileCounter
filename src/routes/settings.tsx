@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { store, useSettings } from "../store";
+import { store } from "../store";
 import SettingsForm from "../components/form/settings";
 import { Settings } from "../definitions";
 
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/settings")({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const settings = useSettings();
+  const settings = store.useSettings();
 
   const onSubmit = async ({ value }: { value: Settings }) => {
     const { errorMessage } = await store.upsertSettings({

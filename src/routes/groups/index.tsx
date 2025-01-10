@@ -2,9 +2,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import PageTemplate from "../../components/pageTemplate/component";
 import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
 import { AddCircle, ArrowLeft, Delete, Edit } from "@mui/icons-material";
-import { store, useCounterGroups } from "../../store";
+import { store } from "../../store";
 import { SortableList } from "../../components/sortableList/component";
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import ConfirmationDialog from "../../components/confirmDialog/component";
 import DynamicIcon from "../../components/dynamicIcon/component";
@@ -15,7 +22,7 @@ export const Route = createFileRoute("/groups/")({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const storeGroups = useCounterGroups();
+  const storeGroups =store.useCounterGroups();
   const [localGroups, setLocalGroups] = useState(storeGroups);
 
   // Sync with store when it updates
@@ -87,7 +94,18 @@ function RouteComponent() {
                 </Typography>
                 <SortableList.DragHandle />
               </Box>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" justifyContent="center" spacing={1}>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="info"
+                    onClick={() => {
+                      navigate({ to: `/groups/${group.id}` });
+                    }}
+                  >
+                    <Edit fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+                <Divider orientation="vertical" flexItem />
                 <ConfirmationDialog
                   title="Delete Group"
                   description="Are you sure you want to delete this group?"
@@ -108,16 +126,6 @@ function RouteComponent() {
                     </Tooltip>
                   )}
                 </ConfirmationDialog>
-                <Tooltip title="Edit">
-                  <IconButton
-                    color="info"
-                    onClick={() => {
-                      navigate({ to: `/groups/${group.id}` });
-                    }}
-                  >
-                    <Edit fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
               </Stack>
             </Box>
           </SortableList.Item>

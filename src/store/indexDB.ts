@@ -1,4 +1,4 @@
-// db.ts
+
 import Dexie, { type EntityTable } from "dexie";
 
 import {
@@ -11,7 +11,7 @@ import {
   Image,
 } from "../definitions";
 
-const db = new Dexie("CountersDatabase") as Dexie & {
+export type DB = Dexie & {
   counters: EntityTable<Counter, "id">;
   counterGroups: EntityTable<CounterGroup, "id">;
   counterActions: EntityTable<CounterAction, "id">;
@@ -21,14 +21,17 @@ const db = new Dexie("CountersDatabase") as Dexie & {
   images: EntityTable<Image, "id">;
 };
 
-db.version(1).stores({
-  counters: "id, [groupId+order], order, faceImageId",
-  counterGroups: "id, order",
-  counterActions: "id, date, [counterId+date]",
-  counterActionsByDay: "[counterId+day]",
-  counterActionsByMonth: "[counterId+month]",
-  settings: "id",
-  images: "id, name", 
-});
+export function createDB(name: string = "CountersDatabase") {
+  const db = new Dexie(name) as DB;
 
-export { db };
+  db.version(1).stores({
+    counters: "id, [groupId+order], order, faceImageId",
+    counterGroups: "id, order",
+    counterActions: "id, date, [counterId+date]",
+    counterActionsByDay: "[counterId+day]",
+    counterActionsByMonth: "[counterId+month]",
+    settings: "id",
+    images: "id, name",
+  });
+  return db;
+}

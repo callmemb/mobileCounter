@@ -3,12 +3,7 @@ import PageTemplate from "../../../components/pageTemplate/component";
 import ShortcutButton from "../../../components/pageTemplate/components/shortcuts/shortcutButton";
 import { ArrowLeft, Delete, Edit } from "@mui/icons-material";
 import {
-  store,
-  useCounter,
-  useCounterActions,
-  useCounterActionsByDay,
-  useCounterActionsByMonth,
-  useCounterGroup,
+  store
 } from "../../../store";
 import {
   Box,
@@ -48,8 +43,8 @@ export const Route = createFileRoute("/counters/$id/")({
 function RouteComponent() {
   const navigate = useNavigate();
   const { id } = Route.useParams();
-  const counter = useCounter(id);
-  const group = useCounterGroup(counter?.groupId || null);
+  const counter = store.useCounter(id);
+  const group = store.useCounterGroup(counter?.groupId || null);
   const [tab, setTab] = useState(0);
 
   return (
@@ -115,7 +110,7 @@ function RouteComponent() {
 type TabProps = { isTab: number; activeTab: number; counterId: string };
 
 function Actions({ isTab, activeTab, counterId }: TabProps) {
-  const actions = useCounterActions(counterId);
+  const actions = store.useCounterActions(counterId);
   return (
     <Box hidden={activeTab !== isTab}>
       <Table>
@@ -191,7 +186,7 @@ const chartStaticOptions = {
 };
 
 function ByDay({ isTab, activeTab, counterId }: TabProps) {
-  const data = useCounterActionsByDay(counterId);
+  const data = store.useCounterActionsByDay(counterId);
   const theme = useTheme();
 
   const chartData = useMemo(
@@ -217,7 +212,7 @@ function ByDay({ isTab, activeTab, counterId }: TabProps) {
 }
 
 function ByMonth({ isTab, activeTab, counterId }: TabProps) {
-  const data = useCounterActionsByMonth(counterId);
+  const data = store.useCounterActionsByMonth(counterId);
   const theme = useTheme();
 
   const chartData = useMemo(

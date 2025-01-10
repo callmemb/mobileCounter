@@ -4,7 +4,7 @@ import { Settings } from "../definitions";
 export function isDaysTheSame(
   day1: Date,
   day2: Date,
-  breakPointTime: Settings["dailyStepsResetTime"] = "0:0:0"
+  breakPointTime: Settings["dailyStepsResetTime"] = "00:00:00"
 ) {
   const [hh, mm, ss] = breakPointTime.split(":");
 
@@ -26,9 +26,24 @@ export function isDaysTheSame(
   );
 }
 
-export function getDate(
+export function getLastBreakPointDate(
   date: Date,
-  breakPointTime: Settings["dailyStepsResetTime"] = "0:0:0",
+  breakPointTime: Settings["dailyStepsResetTime"] = "00:00:00",
+  labelFrom: Settings["dayLabelFrom"] = "startOfRange"
+): Date {
+  const [hh, mm, ss] = breakPointTime.split(":");
+  return dayjs(date)
+    .add(breakPointTime > dayjs(date).format("HH:mm:ss") ? -1 : 0, "d")
+    .add(labelFrom === "endOfRange" ? 1 : 0, "d")
+    .set("hour", +hh)
+    .set("minute", +mm)
+    .set("second", +ss)
+    .toDate();
+}
+
+export function getStringDate(
+  date: Date,
+  breakPointTime: Settings["dailyStepsResetTime"] = "00:00:00",
   labelFrom: Settings["dayLabelFrom"] = "startOfRange",
   format: string = "DD-MM-YYYY"
 ): string {

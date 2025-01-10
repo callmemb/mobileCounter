@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { useMemo } from "react";
-import { store, useCounter, useCounterGroups } from "../../../store";
+import { store } from "../../../store";
 import { NewCounter } from "../../../definitions";
 import CounterForm from "../../../components/form/counter";
 
@@ -12,8 +12,8 @@ export const Route = createFileRoute("/counters/$id/edit")({
 function RouteComponent() {
   const { id } = Route.useParams();
 
-  const counter = useCounter(id);
-  const groups = useCounterGroups();
+  const counter = store.useCounter(id);
+  const groups = store.useCounterGroups();
   const navigate = useNavigate();
 
   const onSubmit = async ({ value }: { value: NewCounter }) => {
