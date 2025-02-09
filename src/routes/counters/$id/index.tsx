@@ -32,7 +32,8 @@ import {
   Title,
   Tooltip as ChartTooltip,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2"; // added import
+import type { ChartOptions } from "chart.js";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip);
 
@@ -90,7 +91,7 @@ function RouteComponent() {
 
         <Tabs
           value={tab}
-          onChange={(e, v) => setTab(v)}
+          onChange={(_, v) => setTab(v)}
           textColor="secondary"
           indicatorColor="secondary"
           aria-label="secondary tabs example"
@@ -163,7 +164,7 @@ function Actions({ isTab, activeTab, counterId }: TabProps) {
   );
 }
 
-const chartStaticOptions = {
+const chartStaticOptions: ChartOptions<"bar"> = {
   responsive: true,
   indexAxis: "y" as const,
   maintainAspectRatio: false,

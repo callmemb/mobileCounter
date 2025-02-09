@@ -567,6 +567,68 @@ export class Store {
   deleteAllData() {
     return this.db.delete();
   }
+
+  // New backup functionality: create a JSON backup of all tables.
+  async createBackup(): Promise<{ backupData?: string; errorMessage?: string }> {
+    try {
+      const backup = {
+        counters: await this.db.counters.toArray(),
+        counterGroups: await this.db.counterGroups.toArray(),
+        counterActions: await this.db.counterActions.toArray(),
+        counterActionsByDay: await this.db.counterActionsByDay.toArray(),
+        counterActionsByMonth: await this.db.counterActionsByMonth.toArray(),
+        images: await this.db.images.toArray(),
+        settings: await this.db.settings.toArray(),
+      };
+      return { backupData: JSON.stringify(backup) };
+    } catch (error) {
+      return { errorMessage: error instanceof Error ? error.message : "Unknown error" };
+    }
+  }
+
+  // New restore functionality: import data from a backup JSON string.
+  async importBackup(backupData: string): Promise<{ success: boolean; errorMessage?: string }> {
+    try {
+      const backup = JSON.parse(backupData);
+      await this.db.transaction(
+        "rw",
+        [
+          this.db.counters,
+          this.db.counterGroups,
+          this.db.counterActions,
+          this.db.counterActionsByDay,
+          this.db.counterActionsByMonth,
+          this.db.images,
+          this.db.settings,
+        ],
+        async () => {
+          // Clear all tables.
+          await Promise.all([
+            this.db.counters.clear(),
+            this.db.counterGroups.clear(),
+            this.db.counterActions.clear(),
+            this.db.counterActionsByDay.clear(),
+            this.db.counterActionsByMonth.clear(),
+            this.db.images.clear(),
+            this.db.settings.clear(),
+          ]);
+          // Bulk import backup data.
+          await Promise.all([
+            this.db.counters.bulkPut(backup.counters),
+            this.db.counterGroups.bulkPut(backup.counterGroups),
+            this.db.counterActions.bulkPut(backup.counterActions),
+            this.db.counterActionsByDay.bulkPut(backup.counterActionsByDay),
+            this.db.counterActionsByMonth.bulkPut(backup.counterActionsByMonth),
+            this.db.images.bulkPut(backup.images),
+            this.db.settings.bulkPut(backup.settings),
+          ]);
+        }
+      );
+      return { success: true };
+    } catch (error) {
+      return { success: false, errorMessage: error instanceof Error ? error.message : "Unknown error" };
+    }
+  }
 }
 
 export const store = new Store();

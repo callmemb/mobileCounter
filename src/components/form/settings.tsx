@@ -4,11 +4,13 @@ import {
   Settings,
   settingsValidator,
 } from "../../definitions";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import FormPageTemplate from "../pageTemplate/formPageTemplate";
 import TextInput from "./components/textInput";
 import SelectInput from "./components/selectInput";
 import NumberInput from "./components/numberInput";
+import ShortcutButton from "../pageTemplate/components/shortcuts/shortcutButton";
+import { Backup, ClearAll, ReadMore } from "@mui/icons-material";
+import { store } from "../../store";
 
 interface SettingsFormProps {
   settings: Settings | undefined;
@@ -21,14 +23,85 @@ export default function SettingsForm(props: SettingsFormProps) {
   const form = useForm<Settings, Validator<Settings>>({
     defaultValues: settings,
     onSubmit: onSubmit,
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: settingsValidator,
     },
   });
 
   return (
-    <FormPageTemplate label="Settings" form={form}>
+    <FormPageTemplate
+      label="Settings"
+      form={form}
+      extraOptions={[
+        <ShortcutButton
+          key="clear"
+          id={"clear"}
+          icon={<ClearAll />}
+          color="error"
+          onClick={() => {
+            if (window.confirm("Are you sure you want to clear all data?")) {
+              store.deleteAllData();
+            }
+          }}
+        >
+          Clear all data
+        </ShortcutButton>,
+        <ShortcutButton
+          key="readBackup"
+          id={"readBackup"}
+          icon={<ReadMore />}
+          color="warning"
+          onClick={async () => {
+            // Create and trigger a hidden file input for the backup file.
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = "application/json";
+            fileInput.onchange = async (event) => {
+              const target = event.target as HTMLInputElement;
+              if (target.files && target.files.length > 0) {
+                const file = target.files[0];
+                const backupData = await file.text();
+                const result = await store.importBackup(backupData);
+                if (result.success) {
+                  alert("Backup restored successfully.");
+                } else {
+                  alert("Restore failed: " + result.errorMessage);
+                }
+              }
+            };
+            fileInput.click();
+          }}
+        >
+          Read backup file
+        </ShortcutButton>,
+        <ShortcutButton
+          key="createBackup"
+          id={"createBackup"}
+          icon={<Backup />}
+          color="info"
+          onClick={async () => {
+            try {
+              const { backupData, errorMessage } = await store.createBackup();
+              if (errorMessage) {
+                alert(errorMessage);
+              } else if (backupData) {
+                const blob = new Blob([backupData], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "backup.json";
+                link.click();
+                URL.revokeObjectURL(url);
+              }
+            } catch (error) {
+              alert("Backup failed");
+            }
+          }}
+        >
+          Create backup file
+        </ShortcutButton>,
+      ]}
+    >
       <form.Field
         name="dailyStepsResetTime"
         children={(field) => (

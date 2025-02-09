@@ -9,11 +9,11 @@ import { Box } from "@mui/material";
  */
 type Props = {
   side?: "left" | "right";
-  scrollableRef?: React.RefObject<HTMLDivElement>;
+  scrollableRef?: React.RefObject<HTMLDivElement | null>;
   children: React.ReactNode | React.ReactNode[];
 };
 
-const SCROLL_THRESHOLD = 100; // pixels from edge that triggers scrolling
+const SCROLL_THRESHOLD = 150; // pixels from edge that triggers scrolling
 
 /**
  * Shortcuts component for displaying a list of shortcut buttons.
@@ -42,7 +42,7 @@ export default function ShortcutPanel({
       }
     };
 
-    if (scrolling !== 0) {
+    if (scrollableRef?.current && scrolling !== 0) {
       animationFrameId = requestAnimationFrame(doScrolling);
     }
 
@@ -51,9 +51,10 @@ export default function ShortcutPanel({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [scrolling, scrollableRef]);
+  }, [scrolling, scrollableRef?.current]);
 
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
+    if (!scrollableRef?.current) return;
     const t = e.touches[0];
     const button = document.elementFromPoint(
       t.clientX,
@@ -61,18 +62,16 @@ export default function ShortcutPanel({
     ) as HTMLElement;
     setIdOfHoveredItem(getShortcutElement(button)?.id);
 
-    if (scrollableRef?.current) {
-      const rect = scrollableRef.current.getBoundingClientRect();
-      const relativeY = t.clientY - rect.top;
-      if (relativeY < SCROLL_THRESHOLD) {
-        // Near top - scroll up
-        setScrolling(-10 + (relativeY / SCROLL_THRESHOLD) * 10);
-      } else if (relativeY > rect.height - SCROLL_THRESHOLD) {
-        // Near bottom - scroll down
-        setScrolling(10 - ((rect.height - relativeY) / SCROLL_THRESHOLD) * 10);
-      } else {
-        setScrolling(0);
-      }
+    const rect = scrollableRef.current.getBoundingClientRect();
+    const relativeY = t.clientY - rect.top;
+    if (relativeY < SCROLL_THRESHOLD) {
+      // Near top - scroll up
+      setScrolling(-10 + (relativeY / SCROLL_THRESHOLD) * 10);
+    } else if (relativeY > rect.height - SCROLL_THRESHOLD) {
+      // Near bottom - scroll down
+      setScrolling(10 - ((rect.height - relativeY) / SCROLL_THRESHOLD) * 10);
+    } else {
+      setScrolling(0);
     }
   };
 
@@ -85,6 +84,7 @@ export default function ShortcutPanel({
    * @param {TouchEvent<HTMLElement>} e - The touch end event object
    */
   const onTouchEnd = (e: TouchEvent<HTMLElement>) => {
+    if (!scrollableRef?.current) return;
     const t = e.changedTouches[0];
     const button = document.elementFromPoint(
       t.clientX,
@@ -129,12 +129,11 @@ export default function ShortcutPanel({
   );
 }
 
-function getShortcutElement(element: HTMLElement | null): {
-  element: HTMLElement | null;
-  id: string | null;
-} {
-  if (!element) return { element: null, id: null };
-  const id = element.getAttribute("data-shortcut-id");
-  if (typeof id === "string") return { element, id };
-  return getShortcutElement(element.parentElement);
+function getShortcutElement(element: HTMLElement | null): { element: HTMLElement | null; id: string | null } {
+  while (element) {
+    const id = element.getAttribute("data-shortcut-id");
+    if (id !== null) return { element, id };
+    element = element.parentElement;
+  }
+  return { element: null, id: null };
 }

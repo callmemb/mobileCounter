@@ -5,19 +5,24 @@ import { ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm, Validator } from "@tanstack/react-form";
 
-type FormPageTemplateProps<TFormData, TValidator extends Validator<TFormData>> = {
+type FormPageTemplateProps<
+  TFormData,
+  TValidator extends Validator<TFormData>,
+> = {
   label?: string;
   children: ReactNode | ReactNode[];
   form: ReturnType<typeof useForm<TFormData, TValidator>>;
+  extraOptions?: ReactNode | ReactNode[];
 };
 
 export default function FormPageTemplate<
   TFormData,
-  TValidator extends Validator<TFormData>
+  TValidator extends Validator<TFormData>,
 >({
   label,
   form,
   children,
+  extraOptions,
 }: FormPageTemplateProps<TFormData, TValidator>) {
   const navigate = useNavigate();
 
@@ -36,6 +41,8 @@ export default function FormPageTemplate<
         >
           Cancel
         </ShortcutButton>,
+        <span></span>,
+        extraOptions,
       ]}
       rightOptions={[
         <ShortcutButton

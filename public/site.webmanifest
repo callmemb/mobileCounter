@@ -1,16 +1,16 @@
 {
   "name": "Counter - Mobile Counter Application",
   "short_name": "Counter",
-  "description": "A mobile counter application to help you keep track of numbers",
+  "description": "A mobile counter application designed to help you track and gamify daily tasks",
   "start_url": "/",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
