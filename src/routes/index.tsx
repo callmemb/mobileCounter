@@ -8,6 +8,8 @@ import {
   Settings,
   TextSnippet,
   Undo,
+  Visibility,
+  VisibilityOff,
 } from "@mui/icons-material";
 import { store } from "../store";
 import { z } from "zod";
@@ -25,6 +27,7 @@ export const Route = createFileRoute("/")({
 });
 
 function RouteComponent() {
+  const [showHidden, setShowHidden] = useState(false);
   const { group } = Route.useSearch();
   const navigate = useNavigate();
   const counters = store.useCounters(group || null, true);
@@ -79,47 +82,69 @@ function RouteComponent() {
           Test
         </ShortcutButton>,
       ]}
-      rightOptions={groups.map((g) => (
+      rightOptions={[
         <ShortcutButton
-          key={g.id}
-          id={g.id}
-          icon={<DynamicIcon icon={g.icon} />}
-          isSelected={g.id === group}
+          key={"toggleVisibility"}
+          id={"toggleVisibility"}
+          icon={
+            showHidden ? (
+              <VisibilityOff />
+            ) : (
+              <Visibility />
+            )
+          }
           onClick={() => {
-            navigate({
-              to: ".",
-              search: { group: group === g.id ? undefined : g.id },
-            });
+            setShowHidden(!showHidden);
           }}
         >
-          {g.label}
-        </ShortcutButton>
-      ))}
-      leftOptions={[
-        ...counters.map((c) => (
+          Toggle visibility
+        </ShortcutButton>,
+        ...groups.map((g) => (
           <ShortcutButton
-            key={c.id}
-            id={c.id}
-            icon={<DynamicIcon icon={c.icon} />}
+            key={g.id}
+            id={g.id}
+            icon={<DynamicIcon icon={g.icon} />}
+            isSelected={g.id === group}
             onClick={() => {
-              document
-                .getElementById(c.id)
-                ?.scrollIntoView({ block: "center" });
+              navigate({
+                to: ".",
+                search: { group: group === g.id ? undefined : g.id },
+              });
             }}
           >
-            {c.label}
+            {g.label}
           </ShortcutButton>
         )),
       ]}
+      leftOptions={[
+        ...counters
+          .filter((c) => !c.hidden || showHidden)
+          .map((c) => (
+            <ShortcutButton
+              key={c.id}
+              id={c.id}
+              icon={<DynamicIcon icon={c.icon} />}
+              onClick={() => {
+                document
+                  .getElementById(c.id)
+                  ?.scrollIntoView({ block: "center" });
+              }}
+            >
+              {c.label}
+            </ShortcutButton>
+          )),
+      ]}
     >
       <Stack gap={10} py="1rem" alignItems={"center"}>
-        {counters.map((c) => (
-          <CircularSliderWithActionMemory
-            key={c.id}
-            counter={c}
-            navigate={navigate}
-          />
-        ))}
+        {counters.map((c) =>
+          c.hidden && !showHidden ? null : (
+            <CircularSliderWithActionMemory
+              key={c.id}
+              counter={c}
+              navigate={navigate}
+            />
+          )
+        )}
       </Stack>
     </PageTemplate>
   );
@@ -181,6 +206,18 @@ function CircularSliderWithActionMemory({
           icon: <InfoOutlined />,
           action: () => navigate({ to: "/counters/$id", params: { id: c.id } }),
         },
+        ...(c.currentSteps >= c.dailyGoalOfSteps
+          ? [
+              {
+                id: "hidden",
+                icon: c.hidden ? <VisibilityOff /> : <Visibility />,
+                label: "toggle visibility",
+                action: () => {
+                  store.upsertCounter({ ...c, hidden: !c.hidden });
+                },
+              },
+            ]
+          : []),
       ]}
     />
   );

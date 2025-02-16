@@ -1,7 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import PageTemplate from "../../components/pageTemplate/component";
 import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
-import { AddCircle, ArrowLeft, Delete, Edit, Info } from "@mui/icons-material";
+import {
+  AddCircle,
+  ArrowLeft,
+  Delete,
+  Edit,
+  Info,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import { store } from "../../store";
 import { SortableList } from "../../components/sortableList/component";
 import {
@@ -106,7 +114,24 @@ function RouteComponent() {
               <Typography variant="caption" px={2}>
                 {counter.groupName}
               </Typography>
-              <Stack direction="row" justifyContent='center' spacing={1}>
+              <Stack direction="row" justifyContent="center" spacing={1}>
+                <Tooltip title="Visibility">
+                  <IconButton
+                    color="info"
+                    onClick={() => {
+                      store.upsertCounter({
+                        ...counter,
+                        hidden: !counter.hidden,
+                      });
+                    }}
+                  >
+                    {counter.hidden ? (
+                      <VisibilityOff fontSize="inherit" />
+                    ) : (
+                      <Visibility fontSize="inherit" />
+                    )}
+                  </IconButton>
+                </Tooltip>
                 <Tooltip title="Edit">
                   <IconButton
                     color="info"

@@ -95,8 +95,8 @@ export default function ShortcutPanel({
       e.preventDefault();
       e.stopPropagation();
       relevantNode.element?.click?.();
-      setIdOfHoveredItem(null);
     }
+    setIdOfHoveredItem(null);
     setScrolling(0);
   };
 

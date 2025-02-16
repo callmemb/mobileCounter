@@ -45,7 +45,12 @@ export class Store {
         const firstCounter =
           (await this.db.counters.limit(1).first())?.order || null;
         const order = generateKeyBetween(null, firstCounter);
-        defaults = { id: genId(), order: order, currentSteps: 0 };
+        defaults = {
+          id: genId(),
+          order: order,
+          currentSteps: 0,
+          hidden: false,
+        };
       }
       const validatedRecord = counterValidator.parse({
         ...record,
@@ -392,7 +397,9 @@ export class Store {
       this.db.counters,
       this.db.settings,
       async () => {
-        await this.db.counters.toCollection().modify({ currentSteps: 0 });
+        await this.db.counters
+          .toCollection()
+          .modify({ currentSteps: 0, hidden: false });
         await this.db.settings.update("0", {
           lastDailyStepResetDate: new Date(),
         });
@@ -569,7 +576,10 @@ export class Store {
   }
 
   // New backup functionality: create a JSON backup of all tables.
-  async createBackup(): Promise<{ backupData?: string; errorMessage?: string }> {
+  async createBackup(): Promise<{
+    backupData?: string;
+    errorMessage?: string;
+  }> {
     try {
       const backup = {
         counters: await this.db.counters.toArray(),
@@ -582,12 +592,16 @@ export class Store {
       };
       return { backupData: JSON.stringify(backup) };
     } catch (error) {
-      return { errorMessage: error instanceof Error ? error.message : "Unknown error" };
+      return {
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
   // New restore functionality: import data from a backup JSON string.
-  async importBackup(backupData: string): Promise<{ success: boolean; errorMessage?: string }> {
+  async importBackup(
+    backupData: string
+  ): Promise<{ success: boolean; errorMessage?: string }> {
     try {
       const backup = JSON.parse(backupData);
       await this.db.transaction(
@@ -626,7 +640,10 @@ export class Store {
       );
       return { success: true };
     } catch (error) {
-      return { success: false, errorMessage: error instanceof Error ? error.message : "Unknown error" };
+      return {
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 }

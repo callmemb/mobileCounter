@@ -28,6 +28,7 @@ export const counterValidator = z
     // init by system
     order: z.coerce.string(),
     currentSteps: z.coerce.number().min(0),
+    hidden: z.coerce.boolean(),
   })
   .and(newCounterValidator);
 

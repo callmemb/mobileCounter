@@ -86,7 +86,7 @@ const SlidingButton = styled(Button)(({ theme }) => ({
         borderLeftWidth: 1,
       },
     },
-    "&.hover, &:hover, &:focus": {
+    "&.hover, &:hover": {
       ".label": {
         transform: "scale(1,1)",
       },
