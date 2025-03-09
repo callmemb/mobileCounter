@@ -54,6 +54,9 @@ export default function ShortcutPanel({
   }, [scrolling, scrollableRef?.current]);
 
   const onTouchMove = (e: TouchEvent<HTMLElement>) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     if (!scrollableRef?.current) return;
     const t = e.touches[0];
     const button = document.elementFromPoint(
@@ -84,6 +87,9 @@ export default function ShortcutPanel({
    * @param {TouchEvent<HTMLElement>} e - The touch end event object
    */
   const onTouchEnd = (e: TouchEvent<HTMLElement>) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     if (!scrollableRef?.current) return;
     const t = e.changedTouches[0];
     const button = document.elementFromPoint(
@@ -129,7 +135,10 @@ export default function ShortcutPanel({
   );
 }
 
-function getShortcutElement(element: HTMLElement | null): { element: HTMLElement | null; id: string | null } {
+function getShortcutElement(element: HTMLElement | null): {
+  element: HTMLElement | null;
+  id: string | null;
+} {
   while (element) {
     const id = element.getAttribute("data-shortcut-id");
     if (id !== null) return { element, id };

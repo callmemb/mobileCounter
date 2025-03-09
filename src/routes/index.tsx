@@ -13,7 +13,7 @@ import {
 } from "@mui/icons-material";
 import { store } from "../store";
 import { z } from "zod";
-import { Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import CircularSlider from "../components/circularSlider/component";
 import { Counter, CounterAction } from "../definitions";
 import { useState } from "react";
@@ -73,32 +73,31 @@ function RouteComponent() {
           About
         </ShortcutButton>,
         <ShortcutButton
-          color="warning"
-          key="goToTest"
-          id={"goToTest"}
+          color="primary"
+          key="tutorial"
+          id={"tutorial"}
           icon={<TextSnippet />}
-          onClick={() => navigate({ to: "/test" })}
+          onClick={() => navigate({ to: "/tutorial" })}
         >
-          Test
+          Tutorial
         </ShortcutButton>,
       ]}
       rightOptions={[
         <ShortcutButton
           key={"toggleVisibility"}
           id={"toggleVisibility"}
-          icon={
-            showHidden ? (
-              <VisibilityOff />
-            ) : (
-              <Visibility />
-            )
-          }
+          color="secondary"
+          icon={showHidden ? <VisibilityOff /> : <Visibility />}
           onClick={() => {
             setShowHidden(!showHidden);
           }}
         >
-          Toggle visibility
+          <div style={{ fontSize: "0.9rem", lineHeight: "1.1rem" }}>
+            Toggle visibility <br />
+            for hidden counters
+          </div>
         </ShortcutButton>,
+        <span />,
         ...groups.map((g) => (
           <ShortcutButton
             key={g.id}
@@ -116,34 +115,66 @@ function RouteComponent() {
           </ShortcutButton>
         )),
       ]}
-      leftOptions={[
-        ...counters
-          .filter((c) => !c.hidden || showHidden)
-          .map((c) => (
-            <ShortcutButton
-              key={c.id}
-              id={c.id}
-              icon={<DynamicIcon icon={c.icon} />}
-              onClick={() => {
-                document
-                  .getElementById(c.id)
-                  ?.scrollIntoView({ block: "center" });
-              }}
-            >
-              {c.label}
-            </ShortcutButton>
-          )),
-      ]}
+      leftOptions={counters
+        .filter((c) => !c.hidden || showHidden)
+        .map((c) => (
+          <ShortcutButton
+            key={c.id}
+            id={c.id}
+            icon={<DynamicIcon icon={c.icon} />}
+            onClick={() => {
+              document
+                .getElementById(c.id)
+                ?.scrollIntoView({ block: "center" });
+            }}
+          >
+            {c.label}
+          </ShortcutButton>
+        ))}
     >
       <Stack gap={10} py="1rem" alignItems={"center"}>
-        {counters.map((c) =>
-          c.hidden && !showHidden ? null : (
-            <CircularSliderWithActionMemory
-              key={c.id}
-              counter={c}
-              navigate={navigate}
-            />
+        {counters.length > 0 ? (
+          counters.map((c) =>
+            c.hidden && !showHidden ? null : (
+              <CircularSliderWithActionMemory
+                key={c.id}
+                counter={c}
+                navigate={navigate}
+              />
+            )
           )
+        ) : groups.length > 0 ? (
+          <Stack gap={2} alignItems="center">
+            <Button
+              variant="outlined"
+              onClick={() => navigate({ to: "/counters/new" })}
+            >
+              Create first counter
+            </Button>
+            OR
+            <Button
+              variant="outlined"
+              onClick={() => navigate({ to: "/tutorial" })}
+            >
+              Check out the tutorial
+            </Button>
+          </Stack>
+        ) : (
+          <Stack gap={2} alignItems="center">
+            <Button
+              variant="outlined"
+              onClick={() => navigate({ to: "/groups/new" })}
+            >
+              Create first group
+            </Button>
+            OR
+            <Button
+              variant="outlined"
+              onClick={() => navigate({ to: "/tutorial" })}
+            >
+              Check out the tutorial
+            </Button>
+          </Stack>
         )}
       </Stack>
     </PageTemplate>

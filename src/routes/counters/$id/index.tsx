@@ -58,7 +58,7 @@ function RouteComponent() {
           icon={<ArrowLeft />}
           color="warning"
           onClick={() => {
-            navigate({ to: "/counters" });
+            navigate({ to: "/" });
           }}
         >
           Back

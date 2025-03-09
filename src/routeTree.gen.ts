@@ -15,9 +15,13 @@ import { Route as SettingsImport } from './routes/settings'
 import { Route as AboutImport } from './routes/about'
 import { Route as R404Import } from './routes/404'
 import { Route as IndexImport } from './routes/index'
+import { Route as TutorialIndexImport } from './routes/tutorial/index'
 import { Route as TestIndexImport } from './routes/test/index'
 import { Route as GroupsIndexImport } from './routes/groups/index'
 import { Route as CountersIndexImport } from './routes/counters/index'
+import { Route as TutorialSettingsImport } from './routes/tutorial/settings'
+import { Route as TutorialLayoutImport } from './routes/tutorial/layout'
+import { Route as TutorialCounterImport } from './routes/tutorial/counter'
 import { Route as Test2Import } from './routes/test/2'
 import { Route as GroupsNewImport } from './routes/groups/new'
 import { Route as GroupsIdImport } from './routes/groups/$id'
@@ -51,6 +55,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const TutorialIndexRoute = TutorialIndexImport.update({
+  id: '/tutorial/',
+  path: '/tutorial/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const TestIndexRoute = TestIndexImport.update({
   id: '/test/',
   path: '/test/',
@@ -66,6 +76,24 @@ const GroupsIndexRoute = GroupsIndexImport.update({
 const CountersIndexRoute = CountersIndexImport.update({
   id: '/counters/',
   path: '/counters/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TutorialSettingsRoute = TutorialSettingsImport.update({
+  id: '/tutorial/settings',
+  path: '/tutorial/settings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TutorialLayoutRoute = TutorialLayoutImport.update({
+  id: '/tutorial/layout',
+  path: '/tutorial/layout',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TutorialCounterRoute = TutorialCounterImport.update({
+  id: '/tutorial/counter',
+  path: '/tutorial/counter',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -165,6 +193,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Test2Import
       parentRoute: typeof rootRoute
     }
+    '/tutorial/counter': {
+      id: '/tutorial/counter'
+      path: '/tutorial/counter'
+      fullPath: '/tutorial/counter'
+      preLoaderRoute: typeof TutorialCounterImport
+      parentRoute: typeof rootRoute
+    }
+    '/tutorial/layout': {
+      id: '/tutorial/layout'
+      path: '/tutorial/layout'
+      fullPath: '/tutorial/layout'
+      preLoaderRoute: typeof TutorialLayoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/tutorial/settings': {
+      id: '/tutorial/settings'
+      path: '/tutorial/settings'
+      fullPath: '/tutorial/settings'
+      preLoaderRoute: typeof TutorialSettingsImport
+      parentRoute: typeof rootRoute
+    }
     '/counters/': {
       id: '/counters/'
       path: '/counters'
@@ -184,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/test'
       fullPath: '/test'
       preLoaderRoute: typeof TestIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/tutorial/': {
+      id: '/tutorial/'
+      path: '/tutorial'
+      fullPath: '/tutorial'
+      preLoaderRoute: typeof TutorialIndexImport
       parentRoute: typeof rootRoute
     }
     '/counters/$id/edit': {
@@ -214,9 +270,13 @@ export interface FileRoutesByFullPath {
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
   '/test/2': typeof Test2Route
+  '/tutorial/counter': typeof TutorialCounterRoute
+  '/tutorial/layout': typeof TutorialLayoutRoute
+  '/tutorial/settings': typeof TutorialSettingsRoute
   '/counters': typeof CountersIndexRoute
   '/groups': typeof GroupsIndexRoute
   '/test': typeof TestIndexRoute
+  '/tutorial': typeof TutorialIndexRoute
   '/counters/$id/edit': typeof CountersIdEditRoute
   '/counters/$id': typeof CountersIdIndexRoute
 }
@@ -230,9 +290,13 @@ export interface FileRoutesByTo {
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
   '/test/2': typeof Test2Route
+  '/tutorial/counter': typeof TutorialCounterRoute
+  '/tutorial/layout': typeof TutorialLayoutRoute
+  '/tutorial/settings': typeof TutorialSettingsRoute
   '/counters': typeof CountersIndexRoute
   '/groups': typeof GroupsIndexRoute
   '/test': typeof TestIndexRoute
+  '/tutorial': typeof TutorialIndexRoute
   '/counters/$id/edit': typeof CountersIdEditRoute
   '/counters/$id': typeof CountersIdIndexRoute
 }
@@ -247,9 +311,13 @@ export interface FileRoutesById {
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
   '/test/2': typeof Test2Route
+  '/tutorial/counter': typeof TutorialCounterRoute
+  '/tutorial/layout': typeof TutorialLayoutRoute
+  '/tutorial/settings': typeof TutorialSettingsRoute
   '/counters/': typeof CountersIndexRoute
   '/groups/': typeof GroupsIndexRoute
   '/test/': typeof TestIndexRoute
+  '/tutorial/': typeof TutorialIndexRoute
   '/counters/$id/edit': typeof CountersIdEditRoute
   '/counters/$id/': typeof CountersIdIndexRoute
 }
@@ -265,9 +333,13 @@ export interface FileRouteTypes {
     | '/groups/$id'
     | '/groups/new'
     | '/test/2'
+    | '/tutorial/counter'
+    | '/tutorial/layout'
+    | '/tutorial/settings'
     | '/counters'
     | '/groups'
     | '/test'
+    | '/tutorial'
     | '/counters/$id/edit'
     | '/counters/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -280,9 +352,13 @@ export interface FileRouteTypes {
     | '/groups/$id'
     | '/groups/new'
     | '/test/2'
+    | '/tutorial/counter'
+    | '/tutorial/layout'
+    | '/tutorial/settings'
     | '/counters'
     | '/groups'
     | '/test'
+    | '/tutorial'
     | '/counters/$id/edit'
     | '/counters/$id'
   id:
@@ -295,9 +371,13 @@ export interface FileRouteTypes {
     | '/groups/$id'
     | '/groups/new'
     | '/test/2'
+    | '/tutorial/counter'
+    | '/tutorial/layout'
+    | '/tutorial/settings'
     | '/counters/'
     | '/groups/'
     | '/test/'
+    | '/tutorial/'
     | '/counters/$id/edit'
     | '/counters/$id/'
   fileRoutesById: FileRoutesById
@@ -312,9 +392,13 @@ export interface RootRouteChildren {
   GroupsIdRoute: typeof GroupsIdRoute
   GroupsNewRoute: typeof GroupsNewRoute
   Test2Route: typeof Test2Route
+  TutorialCounterRoute: typeof TutorialCounterRoute
+  TutorialLayoutRoute: typeof TutorialLayoutRoute
+  TutorialSettingsRoute: typeof TutorialSettingsRoute
   CountersIndexRoute: typeof CountersIndexRoute
   GroupsIndexRoute: typeof GroupsIndexRoute
   TestIndexRoute: typeof TestIndexRoute
+  TutorialIndexRoute: typeof TutorialIndexRoute
   CountersIdEditRoute: typeof CountersIdEditRoute
   CountersIdIndexRoute: typeof CountersIdIndexRoute
 }
@@ -328,9 +412,13 @@ const rootRouteChildren: RootRouteChildren = {
   GroupsIdRoute: GroupsIdRoute,
   GroupsNewRoute: GroupsNewRoute,
   Test2Route: Test2Route,
+  TutorialCounterRoute: TutorialCounterRoute,
+  TutorialLayoutRoute: TutorialLayoutRoute,
+  TutorialSettingsRoute: TutorialSettingsRoute,
   CountersIndexRoute: CountersIndexRoute,
   GroupsIndexRoute: GroupsIndexRoute,
   TestIndexRoute: TestIndexRoute,
+  TutorialIndexRoute: TutorialIndexRoute,
   CountersIdEditRoute: CountersIdEditRoute,
   CountersIdIndexRoute: CountersIdIndexRoute,
 }
@@ -353,9 +441,13 @@ export const routeTree = rootRoute
         "/groups/$id",
         "/groups/new",
         "/test/2",
+        "/tutorial/counter",
+        "/tutorial/layout",
+        "/tutorial/settings",
         "/counters/",
         "/groups/",
         "/test/",
+        "/tutorial/",
         "/counters/$id/edit",
         "/counters/$id/"
       ]
@@ -384,6 +476,15 @@ export const routeTree = rootRoute
     "/test/2": {
       "filePath": "test/2.tsx"
     },
+    "/tutorial/counter": {
+      "filePath": "tutorial/counter.tsx"
+    },
+    "/tutorial/layout": {
+      "filePath": "tutorial/layout.tsx"
+    },
+    "/tutorial/settings": {
+      "filePath": "tutorial/settings.tsx"
+    },
     "/counters/": {
       "filePath": "counters/index.tsx"
     },
@@ -392,6 +493,9 @@ export const routeTree = rootRoute
     },
     "/test/": {
       "filePath": "test/index.tsx"
+    },
+    "/tutorial/": {
+      "filePath": "tutorial/index.tsx"
     },
     "/counters/$id/edit": {
       "filePath": "counters/$id/edit.tsx"

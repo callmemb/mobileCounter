@@ -1,23 +1,9 @@
 
 
 
-gdy mamy dostatecznie duzo przestrzeni dodajemy opisy intended use.
+gdy nie wyswietla sie counter dodac button "dodaj grupe" "dodaj counter"
+dodac strzalke na panel boczny sugerujacy ze mozna scrollowac
+wizzard formularza countera
+domyslne wartości formularza countera
 
-
-
-
-dodac typy akcji countera, umożliwi to dodanie statystyk ile kto co skipuje.
-done, skip, forgot, 
-obręcze na zegarze reprezentujące typy akcji w procentach.
-wszystkie typy sumuja cię do current steps, + dodać propsy dla reszty typów.
-
-
-
-backupy db, do JSON. może kiedyś na server
-
-
-
-
-opcja do zmiany left z right przy shortcuts buttons
-
-paeta kolorow , main ma miec 10 stopni koiloru
+tour dla interfejsu

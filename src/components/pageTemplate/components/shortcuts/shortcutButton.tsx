@@ -41,6 +41,7 @@ export default function ShortcutButton({
   );
 }
 
+const slideOutDelay = '0s';
 const SlidingButton = styled(Button)(({ theme }) => ({
   minWidth: 45,
   display: "flex",
@@ -86,9 +87,18 @@ const SlidingButton = styled(Button)(({ theme }) => ({
         borderLeftWidth: 1,
       },
     },
-    "&.hover, &:hover": {
+    '@media (hover: hover) and (pointer: fine)': {
+      "&:hover": {
+        ".label": {
+          transform: "scale(1,1)",
+          transitionDelay: slideOutDelay, 
+        },
+      },
+    },
+    "&.hover": {
       ".label": {
         transform: "scale(1,1)",
+        transitionDelay: slideOutDelay, 
       },
     },
     ".label": {

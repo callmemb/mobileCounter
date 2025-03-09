@@ -36,7 +36,7 @@ export default function FormPageTemplate<
           icon={<ArrowLeft />}
           color="warning"
           onClick={() => {
-            navigate({ to: ".." });
+            navigate({ to: "/" });
           }}
         >
           Cancel
