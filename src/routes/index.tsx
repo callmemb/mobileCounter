@@ -83,21 +83,25 @@ function RouteComponent() {
         </ShortcutButton>,
       ]}
       rightOptions={[
-        <ShortcutButton
-          key={"toggleVisibility"}
-          id={"toggleVisibility"}
-          color="secondary"
-          icon={showHidden ? <VisibilityOff /> : <Visibility />}
-          onClick={() => {
-            setShowHidden(!showHidden);
-          }}
-        >
-          <div style={{ fontSize: "0.9rem", lineHeight: "1.1rem" }}>
-            Toggle visibility <br />
-            for hidden counters
-          </div>
-        </ShortcutButton>,
-        <span />,
+        ...(counters.length > 0
+          ? [
+              <ShortcutButton
+                key={"toggleVisibility"}
+                id={"toggleVisibility"}
+                color="secondary"
+                icon={showHidden ? <VisibilityOff /> : <Visibility />}
+                onClick={() => {
+                  setShowHidden(!showHidden);
+                }}
+              >
+                <div style={{ fontSize: "0.8rem", lineHeight: ".8rem" }}>
+                  Toggle visibility <br />
+                  for hidden counters
+                </div>
+              </ShortcutButton>,
+            ]
+          : []),
+        <span key="space" />,
         ...groups.map((g) => (
           <ShortcutButton
             key={g.id}
@@ -161,6 +165,21 @@ function RouteComponent() {
           </Stack>
         ) : (
           <Stack gap={2} alignItems="center">
+            <Button
+              variant="outlined"
+              color="secondary"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+              onClick={() => store.createDemo()}
+            >
+              <span>Create Demo</span>
+              <span>Gym Workout</span>
+              <small>(One-Punch Man routine)</small>
+            </Button>
+            OR
             <Button
               variant="outlined"
               onClick={() => navigate({ to: "/groups/new" })}

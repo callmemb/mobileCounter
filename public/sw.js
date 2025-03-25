@@ -1,9 +1,6 @@
 const CACHE_NAME = 'counter-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/favicon.svg',
-  '/src/main.tsx'
+  '/'
 ];
 
 self.addEventListener('install', (event) => {

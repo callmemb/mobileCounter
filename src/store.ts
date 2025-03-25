@@ -446,6 +446,101 @@ export class Store {
     }
   }
 
+  async createDemo() {
+    try {
+      // First, ensure we have the settings record with properly formatted values
+      const settingsResult = await this.upsertSettings({
+        id: "0",
+        dailyStepsResetTime: "00:00:00", // Properly formatted time string
+        dayLabelFrom: "startOfRange", // Must be one of the enum values as a string
+        counterActionDaysToLive: 60,
+        counterDayAggregatesDaysToLive: 365,
+        counterMonthAggregatesMonthsToLive: 60,
+      });
+      
+      if (settingsResult.errorMessage) {
+        console.error("Failed to create settings:", settingsResult.errorMessage);
+        return;
+      }
+      
+      // Create the workout group with an appropriate icon
+      const workoutGroup = await this.upsertCounterGroup({
+        label: "One Punch Man Workout",
+        icon: "Favorite", // Heart icon for fitness program
+      });
+      
+      if (!workoutGroup.id || workoutGroup.errorMessage) {
+        console.error("Failed to create group:", workoutGroup.errorMessage || "No group ID returned");
+        return;
+      }
+      
+      console.log("Successfully created group:", workoutGroup.id);
+      
+      // Create each counter with appropriate icons from the available list
+      const counters = [
+        {
+          label: "Push-ups",
+          defaultNumberOfSteps: 10,
+          maxNumberOfSteps: 20,
+          unitsInStep: 1,
+          dailyGoalOfSteps: 100,
+          unitsName: "reps",
+          icon: "ArrowUpward", // Up motion for push-ups
+          groupId: workoutGroup.id,
+          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+        },
+        {
+          label: "Sit-ups", 
+          defaultNumberOfSteps: 10,
+          maxNumberOfSteps: 20,
+          unitsInStep: 1,
+          dailyGoalOfSteps: 100, 
+          unitsName: "reps",
+          icon: "ExpandLess", // Folding motion for sit-ups
+          groupId: workoutGroup.id,
+          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+        },
+        {
+          label: "Squats",
+          defaultNumberOfSteps: 10,
+          maxNumberOfSteps: 20,
+          unitsInStep: 1,
+          dailyGoalOfSteps: 100,
+          unitsName: "reps",
+          icon: "ArrowDownward", // Down motion for squats
+          groupId: workoutGroup.id,
+          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+        },
+        {
+          label: "10km Run",
+          defaultNumberOfSteps: 5,
+          maxNumberOfSteps: 10,
+          unitsInStep: 1,
+          dailyGoalOfSteps: 10,
+          unitsName: "km",
+          icon: "Navigation", // Direction icon for running
+          groupId: workoutGroup.id,
+          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+        }
+      ];
+      
+      // Insert each counter
+      for (const counter of counters) {
+        const result = await this.upsertCounter(counter);
+        
+        if (result.errorMessage) {
+          console.error(`Failed to create counter ${counter.label}:`, result.errorMessage);
+        } else {
+          console.log(`Created counter ${counter.label} with ID ${result.id}`);
+        }
+      }
+      
+      console.log("One Punch Man workout demo created successfully");
+    } catch (error) {
+      console.error("Failed to create demo:", error);
+    }
+  }
+
   useCounter(id: Counter["id"]) {
     return useLiveQuery(() => this.db.counters.get(id), [id]);
   }
@@ -571,8 +666,9 @@ export class Store {
     return useLiveQuery(() => this.db.settings.get("0"), []);
   }
 
-  deleteAllData() {
-    return this.db.delete();
+  async deleteAllData() {
+    await this.db.delete();
+    window.location.reload();
   }
 
   // New backup functionality: create a JSON backup of all tables.
