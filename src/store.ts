@@ -448,94 +448,194 @@ export class Store {
 
   async createDemo() {
     try {
-      // First, ensure we have the settings record with properly formatted values
-      const settingsResult = await this.upsertSettings({
-        id: "0",
-        dailyStepsResetTime: "00:00:00", // Properly formatted time string
-        dayLabelFrom: "startOfRange", // Must be one of the enum values as a string
-        counterActionDaysToLive: 60,
-        counterDayAggregatesDaysToLive: 365,
-        counterMonthAggregatesMonthsToLive: 60,
-      });
-      
-      if (settingsResult.errorMessage) {
-        console.error("Failed to create settings:", settingsResult.errorMessage);
-        return;
-      }
-      
-      // Create the workout group with an appropriate icon
-      const workoutGroup = await this.upsertCounterGroup({
-        label: "One Punch Man Workout",
-        icon: "Favorite", // Heart icon for fitness program
-      });
-      
-      if (!workoutGroup.id || workoutGroup.errorMessage) {
-        console.error("Failed to create group:", workoutGroup.errorMessage || "No group ID returned");
-        return;
-      }
-      
-      console.log("Successfully created group:", workoutGroup.id);
-      
-      // Create each counter with appropriate icons from the available list
-      const counters = [
+      // Define all groups and their counters
+      const groups = [
         {
-          label: "Push-ups",
-          defaultNumberOfSteps: 10,
-          maxNumberOfSteps: 20,
-          unitsInStep: 1,
-          dailyGoalOfSteps: 100,
-          unitsName: "reps",
-          icon: "ArrowUpward", // Up motion for push-ups
-          groupId: workoutGroup.id,
-          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+          id: genId(),
+          label: "One Punch Man Workout",
+          icon: "Favorite",
+          order: generateKeyBetween(null, null),
+          counters: [
+            {
+              label: "Push-ups",
+              defaultNumberOfSteps: 10,
+              maxNumberOfSteps: 20,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 100,
+              unitsName: "reps",
+              icon: "ArrowUpward",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Sit-ups",
+              defaultNumberOfSteps: 10,
+              maxNumberOfSteps: 20,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 100,
+              unitsName: "reps",
+              icon: "ExpandLess",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Squats",
+              defaultNumberOfSteps: 10,
+              maxNumberOfSteps: 20,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 100,
+              unitsName: "reps",
+              icon: "ArrowDownward",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "10km Run",
+              defaultNumberOfSteps: 5,
+              maxNumberOfSteps: 10,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 10,
+              unitsName: "km",
+              icon: "Navigation",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+          ],
         },
         {
-          label: "Sit-ups", 
-          defaultNumberOfSteps: 10,
-          maxNumberOfSteps: 20,
-          unitsInStep: 1,
-          dailyGoalOfSteps: 100, 
-          unitsName: "reps",
-          icon: "ExpandLess", // Folding motion for sit-ups
-          groupId: workoutGroup.id,
-          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+          id: genId(),
+          label: "Healthcare Supplements",
+          icon: "LocalPharmacy",
+          order: generateKeyBetween(null, null),
+          counters: [
+            {
+              label: "Vitamin C",
+              defaultNumberOfSteps: 1,
+              maxNumberOfSteps: 2,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 1,
+              unitsName: "tablet",
+              icon: "LocalHospital",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Vitamin B Complex",
+              defaultNumberOfSteps: 1,
+              maxNumberOfSteps: 2,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 1,
+              unitsName: "tablet",
+              icon: "StarBorder",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Zinc",
+              defaultNumberOfSteps: 1,
+              maxNumberOfSteps: 2,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 1,
+              unitsName: "tablet",
+              icon: "Star",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Magnesium",
+              defaultNumberOfSteps: 1,
+              maxNumberOfSteps: 2,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 1,
+              unitsName: "tablet",
+              icon: "StarHalf",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+          ],
         },
         {
-          label: "Squats",
-          defaultNumberOfSteps: 10,
-          maxNumberOfSteps: 20,
-          unitsInStep: 1,
-          dailyGoalOfSteps: 100,
-          unitsName: "reps",
-          icon: "ArrowDownward", // Down motion for squats
-          groupId: workoutGroup.id,
-          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+          id: genId(),
+          label: "Daily Nutrition",
+          icon: "LocalDining",
+          order: generateKeyBetween(null, null),
+          counters: [
+            {
+              label: "Protein",
+              defaultNumberOfSteps: 20,
+              maxNumberOfSteps: 50,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 150,
+              unitsName: "g",
+              icon: "FavoriteBorder",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Carbohydrates",
+              defaultNumberOfSteps: 25,
+              maxNumberOfSteps: 100,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 200,
+              unitsName: "g",
+              icon: "ThumbUp",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Fats",
+              defaultNumberOfSteps: 10,
+              maxNumberOfSteps: 30,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 70,
+              unitsName: "g",
+              icon: "Opacity",
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+            {
+              label: "Water",
+              defaultNumberOfSteps: 1,
+              maxNumberOfSteps: 3,
+              unitsInStep: 1,
+              dailyGoalOfSteps: 8,
+              unitsName: "glass",
+              icon: "LocalDrink", // Changed to an icon that exists in the icon map
+              activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            },
+          ],
         },
-        {
-          label: "10km Run",
-          defaultNumberOfSteps: 5,
-          maxNumberOfSteps: 10,
-          unitsInStep: 1,
-          dailyGoalOfSteps: 10,
-          unitsName: "km",
-          icon: "Navigation", // Direction icon for running
-          groupId: workoutGroup.id,
-          activeDaysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-        }
       ];
-      
-      // Insert each counter
-      for (const counter of counters) {
-        const result = await this.upsertCounter(counter);
-        
-        if (result.errorMessage) {
-          console.error(`Failed to create counter ${counter.label}:`, result.errorMessage);
-        } else {
-          console.log(`Created counter ${counter.label} with ID ${result.id}`);
+
+      // Prepare data for bulk operations
+      const groupsToAdd = groups.map(({ counters, ...group }) => group);
+
+      const countersToAdd: Counter[] = [];
+
+      // Create counter objects with proper IDs and order
+      for (const group of groups) {
+        let lastOrder = null;
+
+        for (const counter of group.counters) {
+          const order = generateKeyBetween(lastOrder, null);
+          lastOrder = order;
+
+          countersToAdd.push({
+            id: genId(),
+            order,
+            currentSteps: 0,
+            hidden: false,
+            groupId: group.id,
+            ...counter,
+          });
         }
       }
-      
-      console.log("One Punch Man workout demo created successfully");
+
+      // Execute bulk operations inside a transaction
+      await this.db.transaction(
+        "rw",
+        [this.db.counterGroups, this.db.counters],
+        async () => {
+          // Add all groups in one operation
+          await this.db.counterGroups.bulkAdd(groupsToAdd);
+
+          // Add all counters in one operation
+          await this.db.counters.bulkAdd(countersToAdd);
+        }
+      );
+
+      console.log(
+        `Demo created successfully with ${groupsToAdd.length} groups and ${countersToAdd.length} counters`
+      );
     } catch (error) {
       console.error("Failed to create demo:", error);
     }
@@ -667,8 +767,26 @@ export class Store {
   }
 
   async deleteAllData() {
-    await this.db.delete();
-    window.location.reload();
+    try {
+      // First delete the database
+      await this.db.delete();
+
+      // Navigate to root path
+      window.location.href = "/";
+
+      // Force page reload after a short delay to ensure DB deletion completes
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting data:", error);
+      return {
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
   }
 
   // New backup functionality: create a JSON backup of all tables.
