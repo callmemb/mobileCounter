@@ -1,41 +1,30 @@
-import TextField, { TextFieldProps } from "@mui/material/TextField";
-import { Tooltip } from "@mui/material";
+import { TextFieldProps } from "@mui/material/TextField";
+import { useFieldContext } from "../context";
+import BaseInput from "./baseInput";
 
 export type TextInputProps = Omit<TextFieldProps, "value" | "onChange"> & {
+  label: string;
   errorMessage?: string;
   popupErrors?: boolean;
-  value?: string;
-  onChange?: (value: string) => void;
 };
 
 export default function TextInput(props: TextInputProps) {
   const {
-    value = "",
-    onChange,
-    errorMessage,
-    popupErrors,
-    ...otherProps
-  } = props;
+    handleChange,
+    state: {
+      value,
+      meta: { errors, isTouched },
+    },
+  } = useFieldContext<string>();
+
+  const errorMessage = isTouched ? errors.map((e) => e.message).join(",") : "";
+
   return (
-    <Tooltip
-      title={errorMessage}
-      disableFocusListener
-      disableHoverListener
-      disableTouchListener
-      open={popupErrors && !!errorMessage}
-    >
-      <TextField
-        error={!!errorMessage}
-        helperText={popupErrors ? "" : errorMessage}
-        variant="outlined"
-        fullWidth
-        sx={{ my: 1, ...props.sx }}
-        {...otherProps}
-        value={value}
-        onChange={(e) => {
-          onChange?.(e?.target?.value || "");
-        }}
-      />
-    </Tooltip>
+    <BaseInput
+      value={value}
+      onChange={handleChange}
+      errorMessage={errorMessage}
+      {...props}
+    />
   );
 }

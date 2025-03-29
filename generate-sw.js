@@ -42,10 +42,10 @@ const urlsToCache = ${JSON.stringify(urlsToCache, null, 2)};
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Cache otwarty: ${CACHE_NAME}');
+      console.log("Cache otwarty: ${CACHE_NAME}");
       return cache.addAll(urlsToCache).then(() => self.skipWaiting());
     }).catch((err) => {
-      console.error('Błąd podczas cache\'owania:', err);
+      console.error("Błąd podczas cache'owania:", err);
     })
   );
 });
@@ -56,7 +56,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((name) => {
           if (name !== CACHE_NAME) {
-            console.log('Usuwanie starego cache\'u:', name);
+            console.log("Usuwanie starego cache'u:", name);
             return caches.delete(name);
           }
         })
@@ -89,5 +89,5 @@ self.addEventListener('message', (event) => {
 }
 
 generateServiceWorker().catch((error) => {
-  console.error('Błąd generowania Service Workera:', error);
+  console.error("Błąd generowania Service Workera:", error);
 });

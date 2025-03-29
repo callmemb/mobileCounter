@@ -1,9 +1,5 @@
-import { useForm, Validator } from "@tanstack/react-form";
 import { NewCounterGroup, newCounterGroupValidator } from "../../definitions";
-import { zodValidator } from "@tanstack/zod-form-adapter";
-import FormPageTemplate from "../pageTemplate/formPageTemplate";
-import TextInput from "./components/textInput";
-import IconPicker from "./components/iconPicker";
+import { useAppForm } from "./component";
 
 interface CounterGroupFormProps {
   label: string;
@@ -14,54 +10,27 @@ interface CounterGroupFormProps {
 export default function CounterGroupForm(props: CounterGroupFormProps) {
   const { counterGroup, onSubmit, label } = props;
 
-  const form = useForm<NewCounterGroup, Validator<NewCounterGroup>>({
+  const form = useAppForm({
     defaultValues: counterGroup,
     onSubmit: onSubmit,
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: newCounterGroupValidator,
     },
   });
 
   return (
-    <FormPageTemplate label={label} form={form}>
-      <form.Field
-        name="label"
-        children={(field) => (
-          <TextInput
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Label"
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
+    <form.AppForm>
+      <form.FormPageTemplate label={label}>
+        <form.AppField
+          name="label"
+          children={(f) => <f.TextInput label="Label" />}
+        />
 
-      <form.Field
-        name="icon"
-        children={(field) => (
-          <IconPicker
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Icon"
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
-    </FormPageTemplate>
+        <form.AppField
+          name="icon"
+          children={(f) => <f.IconPicker label="Icon" />}
+        />
+      </form.FormPageTemplate>
+    </form.AppForm>
   );
 }

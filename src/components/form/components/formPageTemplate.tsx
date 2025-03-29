@@ -1,31 +1,19 @@
-import PageTemplate from "../../components/pageTemplate/component";
-import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
-import { ArrowLeft, CheckCircleOutline, Restore } from "@mui/icons-material";
 import { ReactNode } from "react";
+import { ArrowLeft, CheckCircleOutline, Restore } from "@mui/icons-material";
 import { useNavigate } from "@tanstack/react-router";
-import { useForm, Validator } from "@tanstack/react-form";
+import { useFormContext } from "../context";
+import PageTemplate from "../../pageTemplate/component";
+import ShortcutButton from "../../pageTemplate/components/shortcuts/shortcutButton";
 
-type FormPageTemplateProps<
-  TFormData,
-  TValidator extends Validator<TFormData>,
-> = {
-  label?: string;
-  children: ReactNode | ReactNode[];
-  form: ReturnType<typeof useForm<TFormData, TValidator>>;
+type FormPageTemplateProps = React.PropsWithChildren<{
+  label: string;
   extraOptions?: ReactNode | ReactNode[];
-};
+}>;
 
-export default function FormPageTemplate<
-  TFormData,
-  TValidator extends Validator<TFormData>,
->({
-  label,
-  form,
-  children,
-  extraOptions,
-}: FormPageTemplateProps<TFormData, TValidator>) {
+export default function FormPageTemplate(props: FormPageTemplateProps) {
+  const { label, children, extraOptions } = props;
+  const form = useFormContext();
   const navigate = useNavigate();
-
   return (
     <PageTemplate
       label={label}
@@ -41,7 +29,7 @@ export default function FormPageTemplate<
         >
           Cancel
         </ShortcutButton>,
-        <span></span>,
+        <span key="spacer"></span>,
         extraOptions,
       ]}
       rightOptions={[

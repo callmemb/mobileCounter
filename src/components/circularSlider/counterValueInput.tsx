@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import NumberInput from "../form/components/numberInput";
 import theme from "../../theme";
 import { Box } from "@mui/material";
+import BaseInput from "../form/components/baseInput";
 
 type CounterValueInputProps = {
   label: string;
@@ -75,13 +75,14 @@ export default function CounterValueInput({
           background: theme.palette.background.paper,
         }}
       >
-        <NumberInput
+        <BaseInput
           type="number"
-          popupErrors
           label={label}
-          errorMessage={errors}
-          value={value}
-          onChange={(v) => setValue(v)}
+          value={!value && value !== 0 ? "" : "" + value}
+          onChange={(value) => {
+            const parsedValue = value === "" ? null : +value;
+            setValue?.(parsedValue as number);
+          }}
           onBlur={resetToDefault}
           slotProps={{
             htmlInput: {
@@ -90,6 +91,7 @@ export default function CounterValueInput({
               step: stepSize,
             },
           }}
+          errorMessage={errors}
         />
       </Box>
     </form>

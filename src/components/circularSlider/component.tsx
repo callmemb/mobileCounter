@@ -165,7 +165,6 @@ export default function CircularSlider({
                 variant="outlined"
                 size="small"
                 color={color}
-                aria-hidden="true" // added aria-hidden
                 sx={{
                   padding: 0.8,
                   minWidth: 0,

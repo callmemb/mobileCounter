@@ -1,17 +1,10 @@
-import { useForm, Validator } from "@tanstack/react-form";
 import {
   NewCounter,
   SelectOption,
   newCounterValidator,
 } from "../../definitions";
-import { zodValidator } from "@tanstack/zod-form-adapter";
-import FormPageTemplate from "../pageTemplate/formPageTemplate";
-import TextInput from "./components/textInput";
-import IconPicker from "./components/iconPicker";
-import SelectInput from "./components/selectInput";
-import NumberInput from "./components/numberInput";
 import { Box } from "@mui/material";
-import ImagePicker from "./components/imagePicker";
+import { useAppForm } from "./component";
 
 interface CounterFormProps {
   label: string;
@@ -23,225 +16,90 @@ interface CounterFormProps {
 export default function CounterForm(props: CounterFormProps) {
   const { counter, onSubmit, label, groupOptions } = props;
 
-  const form = useForm<NewCounter, Validator<NewCounter>>({
+  const form = useAppForm({
     defaultValues: counter,
     onSubmit: onSubmit,
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: newCounterValidator,
     },
   });
 
   return (
-    <FormPageTemplate label={label} form={form}>
-      <form.Field
-        name="label"
-        children={(field) => (
-          <TextInput
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Label"
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
+    <form.AppForm>
+      <form.FormPageTemplate label={label}>
+        <form.AppField
+          name="label"
+          children={(f) => <f.TextInput label="Label" />}
+        />
 
-      <form.Field
-        name="icon"
-        children={(field) => (
-          <IconPicker
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Icon"
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
+        <form.AppField
+          name="icon"
+          children={(f) => <f.IconPicker label="Icon" />}
+        />
 
-      <form.Field
-        name="groupId"
-        children={(field) => (
-          <SelectInput
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Group"
-            options={groupOptions}
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
+        <form.AppField
+          name="groupId"
+          children={(f) => (
+            <f.SelectInput label="Group" options={groupOptions} />
+          )}
+        />
 
-      <Box sx={{ display: "flex", gap: 1 }}>
-        <form.Field
-          name="defaultNumberOfSteps"
-          children={(field) => (
-            <NumberInput
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-              label="Default steps"
-              errorMessage={
-                field.state.meta.isTouched
-                  ? field.state.meta.errors.join(",")
-                  : ""
-              }
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <form.AppField
+            name="defaultNumberOfSteps"
+            children={(f) => <f.NumberInput label="Default steps" />}
+          />
+
+          <form.AppField
+            name="maxNumberOfSteps"
+            validators={{
+              onChangeListenTo: ["defaultNumberOfSteps"],
+            }}
+            children={(f) => <f.NumberInput label="Maximum steps" />}
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <form.AppField
+            name="unitsInStep"
+            children={(f) => <f.NumberInput label="Units in step" />}
+          />
+          <form.AppField
+            name="unitsName"
+            children={(f) => <f.TextInput label="Units name" />}
+          />
+        </Box>
+
+        <form.AppField
+          name="dailyGoalOfSteps"
+          children={(f) => <f.NumberInput label="Daily goal of steps" />}
+        />
+
+        <form.AppField
+          name="activeDaysOfWeek"
+          children={(f) => (
+            <f.SelectInput
+              label="Active days of week"
+              multiple={true}
+              dataType="number"
+              options={[
+                { label: "Sunday", value: 0 },
+                { label: "Monday", value: 1 },
+                { label: "Tuesday", value: 2 },
+                { label: "Wednesday", value: 3 },
+                { label: "Thursday", value: 4 },
+                { label: "Friday", value: 5 },
+                { label: "Saturday", value: 6 },
+              ]}
             />
           )}
         />
 
-        <form.Field
-          name="maxNumberOfSteps"
-          validators={{
-            onChangeListenTo: ["defaultNumberOfSteps"],
-          }}
-          children={(field) => (
-            <NumberInput
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-              label="Maximum steps"
-              errorMessage={
-                field.state.meta.isTouched
-                  ? field.state.meta.errors.join(",")
-                  : ""
-              }
-            />
-          )}
+        <form.AppField
+          name="faceImageId"
+          children={(f) => <f.ImagePicker label="Image" />}
         />
-      </Box>
-
-      <Box sx={{ display: "flex", gap: 1 }}>
-        <form.Field
-          name="unitsInStep"
-          children={(field) => (
-            <NumberInput
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-              label="Units in step"
-              errorMessage={
-                field.state.meta.isTouched
-                  ? field.state.meta.errors.join(",")
-                  : ""
-              }
-            />
-          )}
-        />
-
-        <form.Field
-          name="unitsName"
-          children={(field) => (
-            <TextInput
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-              label="Units name"
-              errorMessage={
-                field.state.meta.isTouched
-                  ? field.state.meta.errors.join(",")
-                  : ""
-              }
-            />
-          )}
-        />
-      </Box>
-
-      <form.Field
-        name="dailyGoalOfSteps"
-        children={(field) => (
-          <NumberInput
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Daily goal of steps"
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
-
-      <form.Field
-        name="activeDaysOfWeek"
-        children={(field) => (
-          <SelectInput
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            multiple={true}
-            dataType="number"
-            label="Active days of week"
-            options={[
-              { label: "Sunday", value: 0 },
-              { label: "Monday", value: 1 },
-              { label: "Tuesday", value: 2 },
-              { label: "Wednesday", value: 3 },
-              { label: "Thursday", value: 4 },
-              { label: "Friday", value: 5 },
-              { label: "Saturday", value: 6 },
-            ]}
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
-
-      <form.Field
-        name="faceImageId"
-        children={(field) => (
-          <ImagePicker
-            id={field.name}
-            name={field.name}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={field.handleChange}
-            label="Image"
-            errorMessage={
-              field.state.meta.isTouched
-                ? field.state.meta.errors.join(",")
-                : ""
-            }
-          />
-        )}
-      />
-    </FormPageTemplate>
+      </form.FormPageTemplate>
+    </form.AppForm>
   );
 }

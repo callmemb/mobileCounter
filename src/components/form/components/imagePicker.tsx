@@ -22,22 +22,28 @@ import {
   Edit as EditIcon,
 } from "@mui/icons-material";
 import { debounce } from "../../../lib/debounce";
-import TextInput, { TextInputProps } from "./textInput";
+import BaseInput, { BaseInputProps } from "./baseInput";
 import { store } from "../../../store";
 import { Image, Image as ImageType } from "../../../definitions";
+import { useFieldContext } from "../context";
 
-type ImagePickerProps = Omit<TextInputProps, "onChange"> & {
-  value?: string;
-  onChange?: (value: string) => void;
-  onBlur?: TextInputProps["onBlur"];
-};
-
+type ImagePickerProps = Omit<BaseInputProps, "onChange">
 export default function ImagePicker({
-  value,
-  onChange,
-  onBlur,
   ...props
 }: ImagePickerProps) {
+
+  const {
+    handleBlur,
+    handleChange,
+    state: {
+      value,
+      meta: { errors, isTouched },
+    },
+  } = useFieldContext<string>();
+
+  const errorMessage = isTouched ? errors.map((e) => e.message).join(",") : "";
+
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuWidth, setMenuWidth] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,14 +82,11 @@ export default function ImagePicker({
     setAnchorEl(null);
     setPage(1);
     setSearchTerm("");
-    const syntheticEvent = new FocusEvent(
-      "blur"
-    ) as unknown as React.FocusEvent<HTMLInputElement>;
-    onBlur?.(syntheticEvent);
+    handleBlur?.();
   };
 
   const handleSelectImage = (imageId: ImageType["id"]) => {
-    onChange?.(imageId); // Store ID instead of URL
+    handleChange?.(imageId); // Store ID instead of URL
     handleClose();
   };
 
@@ -173,7 +176,7 @@ export default function ImagePicker({
 
   const handleClear = (event: React.MouseEvent) => {
     event.stopPropagation();
-    onChange?.('');
+    handleChange?.('');
   };
 
   const toggleManageMode = () => {
@@ -190,7 +193,7 @@ export default function ImagePicker({
           return; // Stop deletion process on first error
         }
         if (imageId === value) {
-          onChange?.('');
+          handleChange?.('');
         }
       }
       setSelectedToDelete(new Set());
@@ -214,10 +217,11 @@ export default function ImagePicker({
 
   return (
     <>
-      <TextInput
+      <BaseInput
         onClick={handleClick}
         onKeyDown={handleInputKeyDown}
         fullWidth
+        errorMessage={errorMessage}
         // Display filename but keep ID as actual value
         inputProps={{
           value: selectedImage?.name || ''

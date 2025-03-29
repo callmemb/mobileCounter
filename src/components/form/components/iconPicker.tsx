@@ -13,21 +13,26 @@ import {
 import { debounce } from "../../../lib/debounce";
 import DynamicIcon from "../../dynamicIcon/component";
 import { IconNameType, searchForIconNames } from "../../../iconRelatedConsts";
-import TextInput, { TextInputProps } from "./textInput";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import BaseInput, { BaseInputProps } from "./baseInput";
+import { useFieldContext } from "../context";
 
-type IconPickerProps = Omit<TextInputProps, "onChange"> & {
-  value?: string;
-  onChange?: (value: IconNameType | "") => void;
-};
-
+type IconPickerProps = Omit<BaseInputProps, "onChange">;
 export default function IconPicker({
-  value,
-  onChange,
-  onBlur,
   ...props
 }: IconPickerProps) {
+  const {
+    handleBlur,
+    handleChange,
+    state: {
+      value,
+      meta: { errors, isTouched },
+    },
+  } = useFieldContext<string | null | undefined>();
+
+  const errorMessage = isTouched ? errors.map((e) => e.message).join(",") : "";
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuWidth, setMenuWidth] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,16 +62,16 @@ export default function IconPicker({
   const handleClose = () => {
     setAnchorEl(null);
     setPage(1);
-    setSearchTerm('');
+    setSearchTerm("");
     // because TS is awesome....
-    const syntheticEvent = new FocusEvent(
-      "blur"
-    ) as unknown as React.FocusEvent<HTMLInputElement>;
-    onBlur?.(syntheticEvent);
+    // const syntheticEvent = new FocusEvent(
+    //   "blur"
+    // ) as unknown as React.FocusEvent<HTMLInputElement>;
+    handleBlur?.();
   };
 
   const handleSelectIcon = (iconName: IconNameType | "") => {
-    onChange?.(iconName);
+    handleChange?.(iconName);
     handleClose();
   };
 
@@ -99,7 +104,10 @@ export default function IconPicker({
     switch (event.key) {
       case "ArrowRight":
         event.preventDefault();
-        if ((selectedIndex + 1) % ITEMS_PER_ROW === 0 && icons.length === ITEMS_PER_PAGE) {
+        if (
+          (selectedIndex + 1) % ITEMS_PER_ROW === 0 &&
+          icons.length === ITEMS_PER_PAGE
+        ) {
           // At the last column, move to next page
           handleNextPage();
           setSelectedIndex(selectedIndex - (ITEMS_PER_ROW - 1)); // Move to first column
@@ -150,11 +158,12 @@ export default function IconPicker({
 
   return (
     <>
-      <TextInput
+      <BaseInput
         onClick={handleClick}
         onKeyDown={handleInputKeyDown}
         fullWidth
-        value={value}
+        value={value || undefined}
+        errorMessage={errorMessage}
         {...props}
         slotProps={{
           input: {

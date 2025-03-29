@@ -1,6 +1,7 @@
 import { MenuItem } from "@mui/material";
 import { SelectOption } from "../../../definitions";
-import TextInput, { TextInputProps } from "./textInput";
+import { useFieldContext } from "../context";
+import BaseInput, { BaseInputProps } from "./baseInput";
 
 type DataTypeToType<T extends "string" | "number"> = T extends "number"
   ? number
@@ -11,7 +12,7 @@ type SelectValue<
 > = M extends true ? DataTypeToType<T>[] : DataTypeToType<T>;
 
 type SelectInputProps<T extends "string" | "number", M extends boolean> = Omit<
-  TextInputProps,
+  BaseInputProps,
   "onChange" | "value" | "options" | "multiple"
 > & {
   options: SelectOption[];
@@ -25,14 +26,26 @@ export default function SelectInput<
   T extends "string" | "number" = "string",
   M extends boolean = false,
 >(props: SelectInputProps<T, M>) {
-  const { options, value, multiple, onChange, dataType, ...otherProps } = props;
+  const { options, multiple, dataType, ...otherProps } = props;
+
+  const {
+    handleChange,
+    state: {
+      value,
+      meta: { errors, isTouched },
+    },
+  } = useFieldContext<DataTypeToType<T>[] | DataTypeToType<T>>();
+
+  const errorMessage = isTouched ? errors.map((e) => e.message).join(",") : "";
+
   return (
-    <TextInput
+    <BaseInput
       select
       slotProps={{
         select: { multiple },
       }}
       {...otherProps}
+      errorMessage={errorMessage}
       // @ts-expect-error - TS too stupid to handle this case.
       value={multiple ? Array.from(value || []) : value}
       onChange={(value: string | string[]) => {
@@ -40,12 +53,12 @@ export default function SelectInput<
           const converted = (value as string[]).map((v) =>
             dataType === "number" ? +v : v
           ) as SelectValue<T, M>;
-          onChange?.(converted);
+          handleChange?.(converted);
         } else {
           const converted = (
             dataType === "number" ? +value : value
           ) as SelectValue<T, M>;
-          onChange?.(converted);
+          handleChange?.(converted);
         }
       }}
     >
@@ -54,6 +67,6 @@ export default function SelectInput<
           {option.label}
         </MenuItem>
       ))}
-    </TextInput>
+    </BaseInput>
   );
 }

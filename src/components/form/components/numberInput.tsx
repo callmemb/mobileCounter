@@ -1,24 +1,29 @@
-import TextInput, { TextInputProps } from "./textInput";
+import { useFieldContext } from "../context";
+import BaseInput, { BaseInputProps } from "./baseInput";
 
-type NumberInputProps = Omit<TextInputProps, "onChange" | "value"> & {
-  value?: number | undefined | null;
-  onChange?: (value: number) => void;
-};
+type NumberInputProps = Omit<BaseInputProps, "onChange" | "value"> & {};
 
 export default function NumberInput(props: NumberInputProps) {
-  const { value, onChange, ...otherProps } = props;
+  const {
+    handleChange,
+    state: {
+      value,
+      meta: { errors, isTouched },
+    },
+  } = useFieldContext<number>();
+
+  const errorMessage = isTouched ? errors.map((e) => e.message).join(",") : "";
 
   return (
-    <TextInput
+    <BaseInput
       type="number"
-      {...otherProps}
+      {...props}
       value={!value && value !== 0 ? "" : "" + value}
       onChange={(value) => {
         const parsedValue = value === "" ? null : +value;
-        // hack allowing to clear the input
-        // Remember to validate the input value
-        onChange?.(parsedValue as number);
+        handleChange?.(parsedValue as number);
       }}
+      errorMessage={errorMessage}
     />
   );
 }
