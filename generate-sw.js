@@ -34,7 +34,7 @@ async function generateServiceWorker() {
   const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14); // np. 20250325123456
   const CACHE_NAME = `my-app-cache-${timestamp}`;
 
-  // Zawartość Service Workera
+  // Modified Service Worker content with network-first strategy
   const swContent = `
 const CACHE_NAME = '${CACHE_NAME}';
 const urlsToCache = ${JSON.stringify(urlsToCache, null, 2)};
@@ -67,11 +67,32 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).catch(() => {
-        return caches.match('/offline.html');
-      });
-    })
+    fetch(event.request)
+      .then(networkResponse => {
+        // Clone the response because we might need to use it twice
+        const responseToCache = networkResponse.clone();
+
+        // Add the response to cache for future offline use
+        if (networkResponse.status === 200) {
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+
+        return networkResponse;
+      })
+      .catch(() => {
+        // Network failed, try to get it from cache
+        return caches.match(event.request, {
+          ignoreSearch: true
+        }).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // If not in cache, return the offline page
+          return caches.match('/offline.html');
+        });
+      })
   );
 });
 
@@ -80,7 +101,7 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-  `;
+`;
 
   // Zapisz plik sw.js w dist
   await fs.writeFile(join(distDir, 'sw.js'), swContent.trim());
