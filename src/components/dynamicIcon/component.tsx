@@ -9,7 +9,10 @@ type DynamicIconProps = {
 } & SvgIconProps;
 
 export default function DynamicIcon({ icon, ...iconProps }: DynamicIconProps) {
-  const SelectedIcon = iconMap?.[icon as IconNameType] ?? AutoAwesome;
+  // Check if the icon is a valid string and exists in the iconMap
+  const isValidIcon = typeof icon === 'string' && icon !== '' && icon in iconMap;
+  // Use the validated icon or fall back to AutoAwesome
+  const SelectedIcon = isValidIcon ? iconMap[icon as IconNameType] : AutoAwesome;
 
   return (
     <Suspense fallback={<DownloadingIcon {...iconProps} />}>

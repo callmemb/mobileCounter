@@ -7,7 +7,7 @@ import { Settings } from "../definitions";
 const useResetDailySteps = (settings: Settings | undefined) => {
   useEffect(() => {
     // reset daily steps
-    if (!settings?.dailyStepsResetTime) return;
+    if (!settings?.dailyStepsResetTime) return () => {};
     const { dailyStepsResetTime, lastDailyStepResetDate } = settings || {};
     const [hh, mm, ss] = dailyStepsResetTime.split(":");
     const job = new CronJob(

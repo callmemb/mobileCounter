@@ -13,6 +13,15 @@ export default defineConfig({
     }),
     react(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+        inlineDynamicImports: true
+      }
+    },
+    minify: true,
+  },
   // test: {
   //   globals: true,
   //   environment: 'jsdom',
