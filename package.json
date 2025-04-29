@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "vite",
     "devH": "vite --host",
-    "prebuild": "rm -rf dist",
+    "prebuild": "rm -rf out",
     "build": "tsc -b && vite build",
-    "postbuild": "node scripts/html-to-php.js && node scripts/generate-sw.js && node scripts/generate-csp-hashes.js",
+    "postbuild": "node scripts/generate-sw.js && node scripts/html-to-php.js && node scripts/generate-csp-hashes.js && node scripts/update-sitemap-dates.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"

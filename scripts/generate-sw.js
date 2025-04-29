@@ -1,15 +1,15 @@
-import { promises as fs } from 'fs';
-import { join } from 'path';
+const fs = require('fs');
+const path = require('path');
 
 async function generateServiceWorker() {
-  const distDir = join(process.cwd(), 'dist');
+  const distDir = path.join(process.cwd(), 'out');
   const files = [];
 
   // Rekurencyjne odczytywanie wszystkich plików w dist
   async function scanDir(dir) {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
-      const fullPath = join(dir, entry.name);
+      const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         await scanDir(fullPath);
       } else {
@@ -23,7 +23,7 @@ async function generateServiceWorker() {
   await scanDir(distDir);
 
   // Filtruj zasoby do cache'owania
-  const urlsToCache = ['/', '/offline.html', ...files.filter(file => 
+  const urlsToCache = ['/', ...files.filter(file => 
     file.endsWith('.html') || 
     file.endsWith('.js') || 
     file.endsWith('.css') || 
@@ -34,7 +34,7 @@ async function generateServiceWorker() {
   const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14); // np. 20250325123456
   const CACHE_NAME = `my-app-cache-${timestamp}`;
 
-  // Modified Service Worker content with network-first strategy
+  // Service Worker z uproszczoną strategią cache-first
   const swContent = `
 const CACHE_NAME = '${CACHE_NAME}';
 const urlsToCache = ${JSON.stringify(urlsToCache, null, 2)};
@@ -61,36 +61,42 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      return self.clients.claim();
     })
   );
 });
 
 self.addEventListener('fetch', (event) => {
+  // Only deal with GET requests
+  if (event.request.method !== 'GET') return;
+  
   event.respondWith(
-    fetch(event.request)
-      .then(networkResponse => {
-        // Clone the response because we might need to use it twice
-        const responseToCache = networkResponse.clone();
-
-        // Add the response to cache for future offline use
-        if (networkResponse.status === 200) {
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
-          });
+    caches.match(event.request, { ignoreSearch: true })
+      .then((cachedResponse) => {
+        // Jeśli mamy w cache, zwróć z cache'u
+        if (cachedResponse) {
+          return cachedResponse;
         }
 
-        return networkResponse;
-      })
-      .catch(() => {
-        // Network failed, try to get it from cache
-        return caches.match(event.request, {
-          ignoreSearch: true
-        }).then(cachedResponse => {
-          if (cachedResponse) {
-            return cachedResponse;
+        // W przeciwnym razie pobierz z sieci
+        return fetch(event.request).then((networkResponse) => {
+          // Jeśli odpowiedź jest niepoprawna, po prostu ją zwróć
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
           }
-          // If not in cache, return the offline page
-          return caches.match('/offline.html');
+
+          // Sklonuj odpowiedź, żeby móc ją dodać do cache'u
+          const responseToCache = networkResponse.clone();
+          
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+
+          return networkResponse;
+        }).catch(() => {
+          // W przypadku błędu, pozwól hostingowi obsłużyć odpowiedź
+          throw new Error('Network error');
         });
       })
   );
@@ -104,7 +110,7 @@ self.addEventListener('message', (event) => {
 `;
 
   // Zapisz plik sw.js w dist
-  await fs.writeFile(join(distDir, 'sw.js'), swContent.trim());
+  fs.writeFileSync(path.join(distDir, 'sw.js'), swContent.trim());
   console.log('Service Worker wygenerowany z CACHE_NAME:', CACHE_NAME);
   console.log('Liczba plików w urlsToCache:', urlsToCache.length);
 }
