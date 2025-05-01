@@ -57,11 +57,11 @@ Header set Cross-Origin-Opener-Policy "same-origin"
 
 # List of what browser can use
 
-Header set Permissions-Policy "accelerometer=(), camera=(), gyroscope=(), geolocation=(self), fullscreen=(self), magnetometer=(), microphone=(), payment=(), picture-in-picture=(), encrypted-media=(self), navigation-override=(), publickey-credentials-get=(), speaker-selection=(), sync-xhr=(), usb=()"
+Header set Permissions-Policy "accelerometer=(), camera=(), gyroscope=(), geolocation=(self), fullscreen=(self), magnetometer=(), microphone=(), payment=(), picture-in-picture=(), encrypted-media=(self), publickey-credentials-get=(), sync-xhr=(), usb=()"
 
 # What can come from where
 
-Header set Content-Security-Policy "default-src 'self'; img-src 'self'; script-src 'self' @generated-script-csp-hashes@; style-src 'self' @generated-style-csp-hashes@; font-src 'self' @generated-font-csp-hashes@; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; require-trusted-types-for 'script';"
+Header set Content-Security-Policy "default-src 'self'; img-src 'self'; script-src 'self' @generated-script-csp-hashes@; style-src 'self' 'unsafe-inline' @generated-style-csp-hashes@; font-src 'self' @generated-font-csp-hashes@; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; require-trusted-types-for 'script';"
 
 # Remove
 

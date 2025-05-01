@@ -3,9 +3,9 @@ const path = require('path');
 
 async function generateServiceWorker() {
   const distDir = path.join(process.cwd(), 'out');
-  const files = [];
+  const files = new Set();
 
-  // Rekurencyjne odczytywanie wszystkich plików w dist
+  // Recursively read all files in dist
   async function scanDir(dir) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
@@ -13,108 +13,114 @@ async function generateServiceWorker() {
       if (entry.isDirectory()) {
         await scanDir(fullPath);
       } else {
-        // Dodaj ścieżkę relatywną do dist
-        const relativePath = '/' + fullPath.replace(distDir, '').replace(/\\/g, '/').replace(/^\//, '');
-        files.push(relativePath);
+        // Add path relative to dist
+        let relativePath = '/' + fullPath.replace(distDir, '').replace(/\\/g, '/').replace(/^\//, '');
+        
+        // Convert PHP extensions to HTML for caching purposes
+        if (relativePath.endsWith('.php')) {
+          relativePath = relativePath.replace(/\.php$/, '.html');
+        }
+        
+        files.add(relativePath);
       }
     }
   }
 
   await scanDir(distDir);
 
-  // Filtruj zasoby do cache'owania
-  const urlsToCache = ['/', ...files.filter(file => 
-    file.endsWith('.html') || 
-    file.endsWith('.js') || 
-    file.endsWith('.css') || 
-    file.includes('/assets/')
-  )];
+  // Filter resources to cache
+  const urlsToCache = new Set(['/']);
+  
+  for (const file of files) {
+    if ((file.endsWith('.html') || 
+        file.endsWith('.js') || 
+        file.endsWith('.css') || 
+        file.includes('/assets/')) && 
+        !file.endsWith('/sw.js')) {
+      urlsToCache.add(file);
+    }
+  }
 
-  // Generuj unikalną nazwę cache'u na podstawie daty i czasu
-  const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14); // np. 20250325123456
-  const CACHE_NAME = `my-app-cache-${timestamp}`;
+  console.log(`Prepared ${urlsToCache.size} unique URLs for caching`);
 
-  // Service Worker z uproszczoną strategią cache-first
+  // Generate unique cache name based on date and time
+  const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);
+  const CACHE_NAME = `app-cache-${timestamp}`;
+
+  // Standard Service Worker content
   const swContent = `
 const CACHE_NAME = '${CACHE_NAME}';
-const urlsToCache = ${JSON.stringify(urlsToCache, null, 2)};
+const urlsToCache = ${JSON.stringify([...urlsToCache], null, 2)};
 
+// Install event - cache all static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("Cache otwarty: ${CACHE_NAME}");
-      return cache.addAll(urlsToCache).then(() => self.skipWaiting());
-    }).catch((err) => {
-      console.error("Błąd podczas cache'owania:", err);
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(urlsToCache);
+      })
+      .then(() => self.skipWaiting())
   );
 });
 
+// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
-            console.log("Usuwanie starego cache'u:", name);
-            return caches.delete(name);
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
+// Fetch event - cache-first strategy
 self.addEventListener('fetch', (event) => {
-  // Only deal with GET requests
   if (event.request.method !== 'GET') return;
   
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true })
-      .then((cachedResponse) => {
-        // Jeśli mamy w cache, zwróć z cache'u
-        if (cachedResponse) {
-          return cachedResponse;
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response;
         }
 
-        // W przeciwnym razie pobierz z sieci
-        return fetch(event.request).then((networkResponse) => {
-          // Jeśli odpowiedź jest niepoprawna, po prostu ją zwróć
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
+        return fetch(event.request).then((response) => {
+          // Don't cache non-successful responses or non-same-origin responses
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
           }
 
-          // Sklonuj odpowiedź, żeby móc ją dodać do cache'u
-          const responseToCache = networkResponse.clone();
-          
+          // Clone the response
+          const responseToCache = response.clone();
+
+          // Cache the fetched response
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
 
-          return networkResponse;
+          return response;
         }).catch(() => {
-          // W przypadku błędu, pozwól hostingowi obsłużyć odpowiedź
-          throw new Error('Network error');
+          // For HTML requests, return the cached homepage as a fallback
+          if (event.request.headers.get('accept')?.includes('text/html')) {
+            return caches.match('/');
+          }
         });
       })
   );
 });
-
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.action === 'skipWaiting') {
-    self.skipWaiting();
-  }
-});
 `;
 
-  // Zapisz plik sw.js w dist
+  // Save the sw.js file in dist
   fs.writeFileSync(path.join(distDir, 'sw.js'), swContent.trim());
-  console.log('Service Worker wygenerowany z CACHE_NAME:', CACHE_NAME);
-  console.log('Liczba plików w urlsToCache:', urlsToCache.length);
+  console.log('Service Worker generated with CACHE_NAME:', CACHE_NAME);
+  console.log('Number of files cached:', urlsToCache.size);
 }
 
 generateServiceWorker().catch((error) => {
-  console.error("Błąd generowania Service Workera:", error);
+  console.error("Error generating Service Worker:", error);
 });
