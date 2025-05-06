@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { BaseTextFieldProps } from "@mui/material";
-import BaseInput from "../../components/form/components/baseInput";
+import BaseInput from "@/components/form/components/baseInput";
 
 const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 

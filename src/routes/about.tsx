@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../components/pageTemplate/component";
-import ShortcutButton from "../components/pageTemplate/components/shortcuts/shortcutButton";
+import PageTemplate from "@/components/pageTemplate/component";
+import ShortcutButton from "@/components/pageTemplate/components/shortcuts/shortcutButton";
 import { ArrowLeft } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 

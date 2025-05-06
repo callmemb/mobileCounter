@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../components/pageTemplate/component";
-import ShortcutButton from "../components/pageTemplate/components/shortcuts/shortcutButton";
+import PageTemplate from "@/components/pageTemplate/component";
+import ShortcutButton from "@/components/pageTemplate/components/shortcuts/shortcutButton";
 import {
   AvTimer,
   Description,
@@ -11,13 +11,13 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-import { store } from "../store";
+import { store } from "@/store";
 import { z } from "zod";
 import { Button, Stack } from "@mui/material";
-import CircularSlider from "../components/circularSlider/component";
-import { Counter, CounterAction } from "../definitions";
+import CircularSlider from "@/components/circularSlider/component";
+import { Counter, CounterAction } from "@/definitions";
 import { useState } from "react";
-import DynamicIcon from "../components/dynamicIcon/component";
+import DynamicIcon from "@/components/dynamicIcon/component";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,

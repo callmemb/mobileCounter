@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { store } from "../../store";
-import { NewCounter } from "../../definitions";
-import CounterForm from "../../components/form/counter";
+import { store } from "@/store";
+import { NewCounter } from "@/definitions";
+import CounterForm from "@/components/form/counter";
 
 export const Route = createFileRoute("/counters/new")({
   component: RouteComponent,

@@ -1,10 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../../../components/pageTemplate/component";
-import ShortcutButton from "../../../components/pageTemplate/components/shortcuts/shortcutButton";
+import { store } from "@/store";
+import PageTemplate from "@/components/pageTemplate/component";
+import ShortcutButton from "@/components/pageTemplate/components/shortcuts/shortcutButton";
 import { ArrowLeft, Delete, Edit } from "@mui/icons-material";
-import {
-  store
-} from "../../../store";
 import {
   Box,
   IconButton,
@@ -21,8 +19,8 @@ import {
   useTheme,
 } from "@mui/material";
 import dayjs from "dayjs";
-import DynamicIcon from "../../../components/dynamicIcon/component";
-import ConfirmationDialog from "../../../components/confirmDialog/component";
+import DynamicIcon from "@/components/dynamicIcon/component";
+import ConfirmationDialog from "@/components/confirmDialog/component";
 import { useMemo, useState } from "react";
 import {
   Chart as ChartJS,
