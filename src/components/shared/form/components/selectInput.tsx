@@ -1,5 +1,5 @@
 import { MenuItem } from "@mui/material";
-import { SelectOption } from "../../../definitions";
+import { SelectOption } from "../../../../definitions";
 import { useFieldContext } from "../context";
 import BaseInput, { BaseInputProps } from "./baseInput";
 

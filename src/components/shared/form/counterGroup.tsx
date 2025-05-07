@@ -1,5 +1,5 @@
-import { NewCounterGroup, newCounterGroupValidator } from "../../definitions";
-import { useAppForm } from "./component";
+import { NewCounterGroup, newCounterGroupValidator } from "../../../definitions";
+import { useAppForm } from ".";
 
 interface CounterGroupFormProps {
   label: string;

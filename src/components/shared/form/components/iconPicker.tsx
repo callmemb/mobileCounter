@@ -10,9 +10,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { debounce } from "../../../lib/debounce";
-import DynamicIcon from "../../dynamicIcon/component";
-import { IconNameType, searchForIconNames } from "../../../iconRelatedConsts";
+import { debounce } from "../../../../lib/debounce";
+import DynamicIcon from "../../dynamicIcon";
+import { IconNameType, searchForIconNames } from "../../../../iconRelatedConsts";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BaseInput, { BaseInputProps } from "./baseInput";

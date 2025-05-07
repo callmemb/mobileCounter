@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { store } from "@/store";
-import SettingsForm from "@/components/form/settings";
+import SettingsForm from "@/components/shared/form/settings";
 import { Settings } from "@/definitions";
 
 export const Route = createFileRoute("/settings")({

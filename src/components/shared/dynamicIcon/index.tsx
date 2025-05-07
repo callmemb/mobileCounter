@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import AutoAwesome from "@mui/icons-material/AutoAwesome";
 import DownloadingIcon from "@mui/icons-material/Downloading";
-import iconMap, { IconNameType } from "../../iconRelatedConsts";
+import iconMap, { IconNameType } from "../../../iconRelatedConsts";
 import { SvgIconProps } from "@mui/material";
 
 type DynamicIconProps = {

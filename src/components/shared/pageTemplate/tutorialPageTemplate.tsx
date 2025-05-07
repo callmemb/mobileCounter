@@ -1,7 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
-import PageTemplate from "../../components/pageTemplate/component";
-import ShortcutButton from "../../components/pageTemplate/components/shortcuts/shortcutButton";
 import { AppsOutlined, ArrowLeft, AvTimer, Settings } from "@mui/icons-material";
+
+import PageTemplate from "./index";
+import ShortcutButton from "./components/shortcuts/shortcutButton";
 
 export default function TutorialPageTemplate({
   children,

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import TutorialPageTemplate from "@/components/pageTemplate/tutorialPageTemplate";
+import TutorialPageTemplate from "@/components/shared/pageTemplate/tutorialPageTemplate";
 
 export const Route = createFileRoute("/tutorial/layout")({
   component: RouteComponent,

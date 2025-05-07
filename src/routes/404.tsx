@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "@/components/pageTemplate/component";
-import ShortcutButton from "@/components/pageTemplate/components/shortcuts/shortcutButton";
+import PageTemplate from "@/components/shared/pageTemplate";
+import ShortcutButton from "@/components/shared/pageTemplate/components/shortcuts/shortcutButton";
 import { ArrowBack } from "@mui/icons-material";
 import { Box } from "@mui/material";
 

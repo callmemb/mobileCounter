@@ -2,11 +2,11 @@ import {
   dayLabelFromOptions,
   Settings,
   settingsValidator,
-} from "../../definitions";
+} from "../../../definitions";
 import ShortcutButton from "../pageTemplate/components/shortcuts/shortcutButton";
 import { Backup, ClearAll, ReadMore } from "@mui/icons-material";
-import { store } from "../../store";
-import { useAppForm } from "./component";
+import { store } from "../../../store";
+import { useAppForm } from ".";
 
 interface SettingsFormProps {
   settings: Settings | undefined;

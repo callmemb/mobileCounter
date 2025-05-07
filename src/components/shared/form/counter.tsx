@@ -2,9 +2,9 @@ import {
   NewCounter,
   SelectOption,
   newCounterValidator,
-} from "../../definitions";
+} from "../../../definitions";
 import { Box } from "@mui/material";
-import { useAppForm } from "./component";
+import { useAppForm } from ".";
 
 interface CounterFormProps {
   label: string;

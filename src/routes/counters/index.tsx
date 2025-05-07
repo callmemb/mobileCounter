@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "@/components/pageTemplate/component";
-import ShortcutButton from "@/components/pageTemplate/components/shortcuts/shortcutButton";
+import PageTemplate from "@/components/shared/pageTemplate";
+import ShortcutButton from "@/components/shared/pageTemplate/components/shortcuts/shortcutButton";
 import {
   AddCircle,
   ArrowLeft,
@@ -11,7 +11,7 @@ import {
   VisibilityOff,
 } from "@mui/icons-material";
 import { store } from "@/store";
-import { SortableList } from "@/components/sortableList/component";
+import { SortableList } from "@/components/shared/sortableList";
 import {
   Box,
   Divider,
@@ -22,8 +22,8 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Counter } from "@/definitions";
-import ConfirmationDialog from "@/components/confirmDialog/component";
-import DynamicIcon from "@/components/dynamicIcon/component";
+import ConfirmationDialog from "@/components/shared/confirmDialog";
+import DynamicIcon from "@/components/shared/dynamicIcon";
 
 export const Route = createFileRoute("/counters/")({
   component: RouteComponent,

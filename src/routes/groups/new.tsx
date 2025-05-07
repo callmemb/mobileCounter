@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { store } from "@/store";
 import { NewCounterGroup } from "@/definitions";
-import CounterGroupForm from "@/components/form/counterGroup";
+import CounterGroupForm from "@/components/shared/form/counterGroup";
 
 export const Route = createFileRoute("/groups/new")({
   component: RouteComponent,

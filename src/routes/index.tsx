@@ -1,23 +1,22 @@
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import PageTemplate from "@/components/pageTemplate/component";
-import ShortcutButton from "@/components/pageTemplate/components/shortcuts/shortcutButton";
+import { Button, Stack } from "@mui/material";
+import { z } from "zod";
 import {
   AvTimer,
   Description,
   InfoOutlined,
   Settings,
   TextSnippet,
-  Undo,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
+
 import { store } from "@/store";
-import { z } from "zod";
-import { Button, Stack } from "@mui/material";
-import CircularSlider from "@/components/circularSlider/component";
-import { Counter, CounterAction } from "@/definitions";
-import { useState } from "react";
-import DynamicIcon from "@/components/dynamicIcon/component";
+import DynamicIcon from "@/components/shared/dynamicIcon";
+import PageTemplate from "@/components/shared/pageTemplate";
+import ShortcutButton from "@/components/shared/pageTemplate/components/shortcuts/shortcutButton";
+import CircularSliderWithActionMemory from "@/components/home/CircularSliderWithActionMemory";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -140,11 +139,7 @@ function RouteComponent() {
         {counters.length > 0 ? (
           counters.map((c) =>
             c.hidden && !showHidden ? null : (
-              <CircularSliderWithActionMemory
-                key={c.id}
-                counter={c}
-                navigate={navigate}
-              />
+              <CircularSliderWithActionMemory key={c.id} counter={c} />
             )
           )
         ) : groups.length > 0 ? (
@@ -197,78 +192,5 @@ function RouteComponent() {
         )}
       </Stack>
     </PageTemplate>
-  );
-}
-
-function CircularSliderWithActionMemory({
-  counter: c,
-  navigate,
-}: {
-  counter: Counter;
-  navigate: ReturnType<typeof useNavigate>;
-}) {
-  const [actions, setActions] = useState([] as CounterAction[]);
-  const bgImage = store.useImage(c.faceImageId);
-
-  return (
-    <CircularSlider
-      key={c.id}
-      id={c.id}
-      onChange={async (value) => {
-        const { record } = await store.addCounterAction({
-          counterId: c.id,
-          value: value,
-        });
-        if (record) {
-          setActions([...actions, record]);
-        }
-      }}
-      cumulatedSteps={c.currentSteps}
-      defaultStep={c.defaultNumberOfSteps}
-      minStep={0}
-      maxStep={c.maxNumberOfSteps}
-      stepSize={c.unitsInStep}
-      stepsGoal={c.dailyGoalOfSteps}
-      unitName={c.unitsName}
-      label={c.label}
-      bgImage={bgImage?.data}
-      tools={[
-        ...(actions.length > 0
-          ? [
-              {
-                id: "undo",
-                icon: <Undo />,
-                label: "Undo last change",
-                action: () => {
-                  const lastAction = actions[actions.length - 1];
-                  const newActions = actions.slice(0, -1);
-                  if (lastAction) {
-                    store.deleteCounterAction(lastAction.id);
-                    setActions(newActions);
-                  }
-                },
-              },
-            ]
-          : []),
-        {
-          id: "info",
-          label: "More info",
-          icon: <InfoOutlined />,
-          action: () => navigate({ to: "/counters/$id", params: { id: c.id } }),
-        },
-        ...(c.currentSteps >= c.dailyGoalOfSteps
-          ? [
-              {
-                id: "hidden",
-                icon: c.hidden ? <VisibilityOff /> : <Visibility />,
-                label: "toggle visibility",
-                action: () => {
-                  store.upsertCounter({ ...c, hidden: !c.hidden });
-                },
-              },
-            ]
-          : []),
-      ]}
-    />
   );
 }

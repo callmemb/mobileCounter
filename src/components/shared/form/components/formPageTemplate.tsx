@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ArrowLeft, CheckCircleOutline, Restore } from "@mui/icons-material";
 import { useNavigate } from "@tanstack/react-router";
 import { useFormContext } from "../context";
-import PageTemplate from "../../pageTemplate/component";
+import PageTemplate from "../../pageTemplate";
 import ShortcutButton from "../../pageTemplate/components/shortcuts/shortcutButton";
 
 type FormPageTemplateProps = React.PropsWithChildren<{

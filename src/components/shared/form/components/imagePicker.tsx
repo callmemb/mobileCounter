@@ -21,10 +21,10 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
 } from "@mui/icons-material";
-import { debounce } from "../../../lib/debounce";
+import { debounce } from "../../../../lib/debounce";
 import BaseInput, { BaseInputProps } from "./baseInput";
-import { store } from "../../../store";
-import { Image, Image as ImageType } from "../../../definitions";
+import { store } from "../../../../store";
+import { Image, Image as ImageType } from "../../../../definitions";
 import { useFieldContext } from "../context";
 
 type ImagePickerProps = Omit<BaseInputProps, "onChange">
